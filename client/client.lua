@@ -30,14 +30,15 @@ Citizen.CreateThread(function()
         end
 
         -- Check for craftable location starters
+        local blipcount = 0
         for k, loc in ipairs(Config.Locations) do
-            if loc.Blip and blipsadded == false then
-                blipsadded = true
-                Blips.addBlipForCoords(k, loc.name, loc.Blip.Hash, loc.x, loc.y, loc.z)
-            end
-
             local jobcheck = CheckJob(loc.Job)
             if jobcheck and uiopen == false then
+                if loc.Blip and blipsadded == false then
+                    blipcount = blipcount + 1
+                    Blips.addBlipForCoords(k, loc.name, loc.Blip.Hash, loc.x, loc.y, loc.z)
+                end
+
                 local dist = GetDistanceBetweenCoords(loc.x, loc.y, loc.z, Coords.x, Coords.y, Coords.z, 0)
                 if Config.Distances.locations > dist then
                     UIPrompt.activate(loc.name)
@@ -48,6 +49,10 @@ Citizen.CreateThread(function()
                     end
                 end 
             end
+        end
+
+        if blipcount > 0 then
+            blipsadded = true
         end
 
         -- Hide the native rest prompts while the crafting menu is open
