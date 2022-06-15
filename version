@@ -1,6 +1,8 @@
 <1.2.4>
 - Folder/File Restructure.
 - Vorp_Boilerplate standards added
+- Location Blip Support
+- Resource optimizations
 <1.2.3>
 - Job Restrictions for locations, campfires, and individual items.
 - Location Restrictions for individual items.
