@@ -35,12 +35,15 @@ Config.Distances = {
 -- }
 Config.Locations = {
     {
-        name = 'Blackwater Crafting Express',
+        name = 'Blackwater Crafting Station',
         id = 'blackwater',
         Job = 0, -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
         x = -872.222, 
         y = -1390.924, 
-        z = 43.573
+        z = 43.573,
+        Blip = {
+            Hash = 1754365229
+        }
     }
 }
 
