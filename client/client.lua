@@ -16,7 +16,7 @@ Citizen.CreateThread(function()
             local jobcheck = CheckJob(Config.CampfireJobLock)
             if jobcheck and iscrafting == false and uiopen == false then
                 local campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(v), 0) --This is resource intensive, but not sure there is a way around this.
-                if campfire ~= false then
+                if campfire then
                     local jobcheck = false
                     UIPrompt.activate('Campfire')
 
@@ -43,6 +43,7 @@ Citizen.CreateThread(function()
                 if Config.Distances.locations > dist then
                     UIPrompt.activate(loc.name)
                     if Citizen.InvokeNative(0xC92AC953F0A982AE, CraftPrompt) then
+                        print(#Config.Crafting)
                         if keyopen == false then
                             VUI.OpenUI(loc)
                         end
@@ -85,4 +86,20 @@ AddEventHandler("vorp:crafting", function(animation)
 
     keyopen = false
     iscrafting = false
+end)
+
+
+RegisterNetEvent("vorp:AddRecipes")
+AddEventHandler("vorp:AddRecipes", function(recipe)
+    table.insert(Config.Crafting, recipe)
+end)
+
+RegisterNetEvent("vorp:RemoveRecipes")
+AddEventHandler("vorp:RemoveRecipes", function(recipe)
+    for k,v in pairs(Config.Crafting) do
+        if v.Text == recipe.Text then
+            table.remove(Config.Crafting, k)
+            break
+        end
+    end
 end)
