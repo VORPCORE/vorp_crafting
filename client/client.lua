@@ -43,7 +43,7 @@ Citizen.CreateThread(function()
                 if Config.Distances.locations > dist then
                     UIPrompt.activate(loc.name)
                     if Citizen.InvokeNative(0xC92AC953F0A982AE, CraftPrompt) then
-                        print(#Config.Crafting)
+                       -- print(#Config.Crafting)
                         if keyopen == false then
                             VUI.OpenUI(loc)
                         end
