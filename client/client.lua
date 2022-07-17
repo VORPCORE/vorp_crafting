@@ -1,6 +1,5 @@
 keys = Config.Keys
 local iscrafting = false
-local keyopen = false
 local blipsadded = false
 
 Citizen.CreateThread(function()
@@ -12,21 +11,20 @@ Citizen.CreateThread(function()
         local player = PlayerPedId()
         local Coords = GetEntityCoords(player)
         
-        for k, v in pairs(Config.CraftingProps) do
-            local jobcheck = CheckJob(Config.CampfireJobLock)
-            if jobcheck and iscrafting == false and uiopen == false then
-                local campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(v), 0) --This is resource intensive, but not sure there is a way around this.
-                if campfire then
-                    local jobcheck = false
-                    UIPrompt.activate('Campfire')
-
-                    if Citizen.InvokeNative(0xC92AC953F0A982AE, CraftPrompt) then
-                        if keyopen == false then
+        if  Config.CraftingPropsEnabled then
+            local propjobcheck = CheckJob(Config.CampfireJobLock)
+            for k, v in pairs(Config.CraftingProps) do
+                if propjobcheck and iscrafting == false and uiopen == false then
+                    local campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(v), 0) --This is resource intensive, but not sure there is a way around this.
+                    if campfire then
+                        UIPrompt.activate('Campfire')
+    
+                        if Citizen.InvokeNative(0xC92AC953F0A982AE, CraftPrompt) then
                             VUI.OpenUI({ id = 'campfires' })
                         end
-                    end
-                end 
-            end
+                    end 
+                end
+            end 
         end
 
         -- Check for craftable location starters
@@ -37,16 +35,13 @@ Citizen.CreateThread(function()
                 if loc.Blip and blipsadded == false then
                     blipcount = blipcount + 1
                     Blips.addBlipForCoords(k, loc.name, loc.Blip.Hash, loc.x, loc.y, loc.z)
-                end
-
-                local dist = GetDistanceBetweenCoords(loc.x, loc.y, loc.z, Coords.x, Coords.y, Coords.z, 0)
+                end                
+                
+                local dist = getCoordDistance(loc, Coords)
                 if Config.Distances.locations > dist then
                     UIPrompt.activate(loc.name)
                     if Citizen.InvokeNative(0xC92AC953F0A982AE, CraftPrompt) then
-                       -- print(#Config.Crafting)
-                        if keyopen == false then
-                            VUI.OpenUI(loc)
-                        end
+                        VUI.OpenUI(loc)
                     end
                 end 
             end
@@ -84,22 +79,10 @@ AddEventHandler("vorp:crafting", function(animation)
     TriggerEvent("vorp:TipRight", _U('FinishedCrafting'), 4000)
     VUI.Refocus()
 
-    keyopen = false
     iscrafting = false
 end)
 
-
-RegisterNetEvent("vorp:AddRecipes")
-AddEventHandler("vorp:AddRecipes", function(recipe)
-    table.insert(Config.Crafting, recipe)
-end)
-
-RegisterNetEvent("vorp:RemoveRecipes")
-AddEventHandler("vorp:RemoveRecipes", function(recipe)
-    for k,v in pairs(Config.Crafting) do
-        if v.Text == recipe.Text then
-            table.remove(Config.Crafting, k)
-            break
-        end
-    end
+RegisterNetEvent("vorp:UpdateRecipes")
+AddEventHandler("vorp:UpdateRecipes", function(recipes)
+    Config.Crafting = recipes
 end)
