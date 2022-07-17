@@ -36,7 +36,7 @@ ui_page 'ui/index.html'
 dependency 'vorp_core'
 
 --dont touch
-version '1.2.4'
+version '1.3'
 vorp_checker 'yes'
 vorp_name '^4Resource version Check^3'
 vorp_github 'https://github.com/VORPCORE/vorp_crafting'
