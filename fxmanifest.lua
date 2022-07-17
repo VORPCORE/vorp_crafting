@@ -13,7 +13,9 @@ client_scripts {
 }
 
 server_scripts {
-    'server/server.lua'
+    'server/server.lua',
+    'server/apis/events.lua',
+    'server/functions.lua'
 }
 
 shared_scripts {
