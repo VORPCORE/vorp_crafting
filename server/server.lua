@@ -14,7 +14,7 @@ VorpInv.RegisterUsableItem("campfire", function(data)
     TriggerClientEvent("vorp:campfire", data.source)
 end)
 
-AddEventHandler('playerJoining', function()
+AddEventHandler('playerJoining', function() --I think this should be on charselect event thats when you know what player they will be playing and its info?? how is it supposed to know on joining whitout choosing a char...
     -- Let the client know the users job when they join the server.
     local _source = source
     local Character = VorpCore.getUser(_source).getUsedCharacter
