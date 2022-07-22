@@ -33,3 +33,8 @@ RegisterNetEvent("vorp:setjob")
 AddEventHandler("vorp:setjob", function(rjob)
     job = rjob
 end)
+
+RegisterNetEvent("vorp:SelectedCharacter")
+AddEventHandler("vorp:SelectedCharacter", function()
+    TriggerServerEvent('vorp:findjob')
+end)
