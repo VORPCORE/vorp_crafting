@@ -1,4 +1,7 @@
 keys = Config.Keys
+
+progressbar = exports.vorp_progressbar:initiate()
+
 local iscrafting = false
 local blipsadded = false
 
@@ -73,15 +76,14 @@ AddEventHandler("vorp:crafting", function(animation)
 
     Animations.playAnimation(playerPed, animation)
     exports['progressBars']:startUI(Config.CraftTime, _U('Crafting'))
+    progressbar.start(_U('Crafting'), Config.CraftTime, function ()
+        Animations.endAnimation(animation)
 
-    Wait(Config.CraftTime)
+        TriggerEvent("vorp:TipRight", _U('FinishedCrafting'), 4000)
+        VUI.Refocus()
 
-    Animations.endAnimation(animation)
-
-    TriggerEvent("vorp:TipRight", _U('FinishedCrafting'), 4000)
-    VUI.Refocus()
-
-    iscrafting = false
+        iscrafting = false
+    end)
 end)
 
 RegisterNetEvent("vorp:UpdateRecipes")
