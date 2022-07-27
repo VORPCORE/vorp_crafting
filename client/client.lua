@@ -75,7 +75,6 @@ AddEventHandler("vorp:crafting", function(animation)
     end
 
     Animations.playAnimation(playerPed, animation)
-    exports['progressBars']:startUI(Config.CraftTime, _U('Crafting'))
     progressbar.start(_U('Crafting'), Config.CraftTime, function ()
         Animations.endAnimation(animation)
 
