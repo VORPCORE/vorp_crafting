@@ -91,7 +91,7 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
                     local components = {}
     
                     -- Check that the user can carry weapons
-                    TriggerEvent("vorpCore:canCarryWeapons", tonumber(_source), 1, function(canCarryWeapons)
+                    VorpInv.canCarryWeapons(_source, 1, function(canCarryWeapons)
                         if canCarryWeapons  then
                             -- Delete items to crafting
                             for index, item in pairs(crafting.Items) do
