@@ -120,12 +120,14 @@ Config.Categories = {
 --     },
 --     Reward = {
 --         {
---             name = "consumable_breakfast",
+--             name = "consumable_breakfast", -- if you use the currency mode, you don't need a name section inside the reward section
 --             count = 1
 --         }
 --     },
 --     Job = { 'butcher' }, -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
 --     Location = { 'blackwater' }, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+--     UseCurrencyMode = false, -- true if you want to use the currency mode otherwise set this to false
+--     CurrencyType = 0, -- 0 => money, 1 => gold
 --     Category = "food",
 --     Animation = 'knifecooking' -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
 -- }
@@ -153,6 +155,8 @@ Config.Crafting = {
         Type = "item", -- indicate if it is 'weapon' or 'item'
         Job = 0, -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
         Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0, -- 0 = money, 1 = gold
         Category = "food",
         Animation = 'knifecooking'
     },
@@ -179,6 +183,8 @@ Config.Crafting = {
         Type = "item", -- indicate if it is 'weapon' or 'item'
         Job = 0,
         Location = 0,
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food",
         Animation = 'knifecooking'
     }, 
@@ -217,6 +223,8 @@ Config.Crafting = {
         Type = "item", -- indicate if it is 'weapon' or 'item'
         Job = 0,
         Location = 0,
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food"
 
     },
@@ -236,9 +244,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food",
         Animation = 'spindlecook'
     },
@@ -262,9 +272,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food"
     },
     {
@@ -299,9 +311,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food"
     },
     {
@@ -327,6 +341,8 @@ Config.Crafting = {
         Type = "item", -- indicate if it is 'weapon' or 'item'
         Job = 0,
         Location = 0,
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food",
         Animation = 'spindlecook'
     },
@@ -353,6 +369,8 @@ Config.Crafting = {
         Type = "item", -- indicate if it is 'weapon' or 'item'
         Job = 0,
         Location = 0,
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food",
         Animation = 'spindlecook'
     },
@@ -375,6 +393,8 @@ Config.Crafting = {
         Type = "item", -- indicate if it is 'weapon' or 'item'
         Job = 0,
         Location = 0,
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food",
         Animation = 'spindlecook'
     },
@@ -397,6 +417,8 @@ Config.Crafting = {
         Type = "item", -- indicate if it is 'weapon' or 'item'
         Job = 0,
         Location = 0,
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food",
         Animation = 'knifecooking'
     },
@@ -423,6 +445,8 @@ Config.Crafting = {
         Type = "item", -- indicate if it is 'weapon' or 'item'
         Job = 0,
         Location = 0,
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "items"
     },
     {
@@ -448,6 +472,8 @@ Config.Crafting = {
         Type = "item", -- indicate if it is 'weapon' or 'item'
         Job = 0,
         Location = 0,
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "items"
     },
     {
@@ -476,7 +502,9 @@ Config.Crafting = {
         },
         Type = "item", -- indicate if it is 'weapon' or 'item'
         Job = 0,
-        Location = 0, 
+        Location = 0,
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "items"
     },
     {
@@ -498,6 +526,8 @@ Config.Crafting = {
         Type = "item", -- indicate if it is 'weapon' or 'item'
         Job = 0,
         Location = 0,
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food"
     },
     {
@@ -506,19 +536,21 @@ Config.Crafting = {
         Desc = "Recipe: 1x Gold Ore",
         Items = {
             {
-                name = "gold",
-                count = 1
+                name = "goldnugget",
+                count = 14
             }
         },
         Reward ={
             {
-                name = "golden_nugget",
+                --name = "gold", -- if you use the currency mode, you don't need a name section inside the reward section
                 count = 1
             }
         },
         Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = true,
+        CurrencyType = 1,
         Category = "items"
     },
     {
@@ -537,9 +569,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food"
     },
     {
@@ -558,9 +592,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "items"
     },
     {
@@ -579,9 +615,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "items"
     },
     {
@@ -608,9 +646,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "items"
     },
     {
@@ -637,9 +677,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "items"
     }, 
     {
@@ -662,9 +704,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "items"
     },
     {
@@ -687,9 +731,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "items"
     }, 
     {
@@ -716,9 +762,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food"
     }, 
     {
@@ -753,9 +801,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food"
     },   
     {
@@ -778,9 +828,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food"
     },
     {
@@ -815,9 +867,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food"
     },
     {
@@ -852,9 +906,11 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
-        Location = 0,
+        Type = "item",
+        Job = 0,
+        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        UseCurrencyMode = false,
+        CurrencyType = 0,
         Category = "food"
     },
 
