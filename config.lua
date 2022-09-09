@@ -62,8 +62,18 @@ Config.KneelingAnimation = true
 Config.CraftingPropsEnabled = true
 
 -- Props for the player to craft at
-Config.CraftingProps = {"P_CAMPFIRECOMBINED01X","p_campfirefresh01x","p_fireplacelogs01x","p_woodstove01x","p_stove04x","p_campfire04x","p_campfire05x","p_campfire02x","p_campfirecombined02x","p_campfirecombined03x","p_kettle03x","p_campfirecombined04x", "P_CAMPFIRECOOK02X","P_CAMPFIRE_WIN2_01X","P_CRAFTINGPOT01X"}
-
+-- List of porps you can use for crafting
+-- "P_CAMPFIRECOMBINED01X","p_campfirefresh01x","p_fireplacelogs01x","p_woodstove01x","p_stove04x","p_campfire04x","p_campfire05x","p_campfire02x","p_campfirecombined02x","p_campfirecombined03x","p_kettle03x","p_campfirecombined04x", "P_CAMPFIRECOOK02X","P_CAMPFIRE_WIN2_01X","P_CRAFTINGPOT01X"
+Config.CraftingProps = {
+    {
+        title = "Campfire",
+        prop = "p_campfire05x"
+    },
+    {
+        title = "Oven",
+        prop = "p_furnace01x"
+    }
+}
 -- How long the progressbar will show when crafting
 Config.CraftTime = 15000
 
@@ -72,7 +82,7 @@ Config.CraftTime = 15000
 -- {
 --     ident = 'food', 
 --     text = 'Craft Food',
---     Location = { 'campfires' }, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+--     Location = { 'campfire' }, -- set to 0 to allow any locations from Config.Locations
 --     Job = { 'butcher' } -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
 -- },
 Config.Categories = {
