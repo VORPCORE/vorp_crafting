@@ -24,7 +24,7 @@ Citizen.CreateThread(function()
                             UIPrompt.activate(v.title)
         
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, CraftPrompt) then
-                                VUI.OpenUI({ id = v.tile:lower()})
+                                VUI.OpenUI({ id = v.title:lower()})
                             end
                         end 
                     end
