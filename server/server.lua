@@ -94,8 +94,13 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
                     VorpInv.canCarryWeapons(_source, 1, function(canCarryWeapons)
                         if canCarryWeapons  then
                             -- Delete items to crafting
-                            for index, item in pairs(crafting.Items) do
-                                VorpInv.subItem(_source, item.name, item.count * countz)
+
+                            if crafting.TakeItems == nil or crafting.TakeItems == true then
+                                for index, item in pairs(crafting.Items) do
+                                    if item.take == nil or item.take == true then
+                                        VorpInv.subItem(_source, item.name, item.count * countz)
+                                    end
+                                end
                             end
 
                             -- Give weapons from the crafting list
@@ -124,9 +129,13 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
                     local invAvailable = VorpInv.canCarryItems(_source, addcount - subcount)
                     if crafting.UseCurrencyMode or (invAvailable and cancarry) then
 
-                        -- Loop through and remove each item
-                        for index, item in pairs(crafting.Items) do
-                            VorpInv.subItem(_source, item.name, item.count * countz)
+                        if crafting.TakeItems == nil or crafting.TakeItems == true then
+                            -- Loop through and remove each item
+                            for index, item in pairs(crafting.Items) do
+                                if item.take == nil or item.take == true then
+                                    VorpInv.subItem(_source, item.name, item.count * countz)
+                                end
+                            end
                         end
 
                         -- Give crafted item(s) to player
