@@ -9,7 +9,8 @@ Config.Keys = {
 
 -- Options: s, m, l
 Config.Styles = {
-    fontSize = 'm'
+    fontSize = 'm',
+    descriptionsidebar = true
 }
 
 Config.Commands = {
