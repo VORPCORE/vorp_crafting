@@ -62,8 +62,8 @@ Config.KneelingAnimation = true
 Config.CraftingPropsEnabled = true
 
 -- Props for the player to craft at
-Config.CraftingProps = {"P_CAMPFIRECOMBINED01X","p_campfirefresh01x","p_fireplacelogs01x","p_woodstove01x","p_stove04x","p_campfire04x","p_campfire05x","p_campfire02x","p_campfirecombined02x","p_campfirecombined03x","p_kettle03x","p_campfirecombined04x", "P_CAMPFIRECOOK02X","P_CAMPFIRE_WIN2_01X","P_CRAFTINGPOT01X"}
-
+Config.CraftingProp1 = {"p_campfire05x"}
+Config.CraftingProp2 = {"p_furnace01x"}
 -- How long the progressbar will show when crafting
 Config.CraftTime = 15000
 
