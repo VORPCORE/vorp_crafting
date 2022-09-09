@@ -17,7 +17,7 @@ Citizen.CreateThread(function()
             
             if  Config.CraftingPropsEnabled then
                 local propjobcheck = CheckJob(Config.CampfireJobLock)
-                for k, v in pairs(Config.CraftingProps) do
+                for k, v in pairs(Config.CraftingProp1) do
                     if propjobcheck and iscrafting == false and uiopen == false then
                         local campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(v), 0) --This is resource intensive, but not sure there is a way around this.
                         if campfire then
@@ -30,6 +30,19 @@ Citizen.CreateThread(function()
                     end
                 end 
             end
+                
+                   for k, v in pairs(Config.CraftingProp2) do
+                    if propjobcheck and iscrafting == false and uiopen == false then
+                        local campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(v), 0) --This is resource intensive, but not sure there is a way around this.
+                        if campfire then
+                            UIPrompt.activate('Oven')
+        
+                            if Citizen.InvokeNative(0xC92AC953F0A982AE, CraftPrompt) then
+                                VUI.OpenUI({ id = 'oven' })
+                            end
+                        end 
+                    end
+                end 
 
             -- Check for craftable location starters
             local blipcount = 0
