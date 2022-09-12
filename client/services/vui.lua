@@ -56,9 +56,8 @@ RegisterNUICallback('vorp-openinv', function(args, cb)
 end)
 
 RegisterNUICallback('vorp-craftevent', function(args, cb)
-
     local count = tonumber(args.quantity)
-    if count ~= nil and count ~= 'close' and count ~= '' and count ~= 0 then
+    if count ~= nil and count ~= 'close' and count ~= '' and count > 0 then
         TriggerServerEvent('vorp:startcrafting', args.craftable, count, args.location)
         cb('ok')
     else

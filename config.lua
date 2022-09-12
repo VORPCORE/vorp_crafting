@@ -9,7 +9,8 @@ Config.Keys = {
 
 -- Options: s, m, l
 Config.Styles = {
-    fontSize = 'm'
+    fontSize = 'm',
+    descriptionsidebar = true
 }
 
 Config.Commands = {
@@ -149,11 +150,13 @@ Config.Crafting = {
         Items = {
             {
                 name = "meat",
-                count = 1
+                count = 1,
+                take = true -- This determines if recipe items will be taken from inventory after crafting. If ommited, it will default to true.
             },
             {
                 name = "salt",
-                count = 1
+                count = 1,
+                take = false -- This determines if recipe items will be taken from inventory after crafting. If ommited, it will default to true.
             }
         },
         Reward = {
@@ -168,7 +171,8 @@ Config.Crafting = {
         UseCurrencyMode = false,
         CurrencyType = 0, -- 0 = money, 1 = gold
         Category = "food",
-        Animation = 'knifecooking'
+        Animation = 'knifecooking',
+        TakeItems = true -- This determines if recipe items will be taken from inventory after crafting. If ommited, it will default to true.
     },
     {
         Text = "Seasoned Small Game ",
