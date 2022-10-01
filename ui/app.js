@@ -291,14 +291,18 @@ createApp({
         if (jobcheck == true) {
           // Filter out locations
           if (item.Location == 0) {
-            consumables[item.Category].push(item)
+            if (consumables[item.Category]){
+              consumables[item.Category].push(item)
+            }
           } else {
             let l = item.Location.length
             let pos = 0
             for (pos; pos < l; pos++) {
               let loc = item.Location[pos]
               if (loc == location?.id) {
-                consumables[item.Category].push(item)
+                if (consumables[item.Category]){
+                  consumables[item.Category].push(item)
+                }
                 break
               }
             }

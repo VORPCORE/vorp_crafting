@@ -89,3 +89,14 @@ RegisterNetEvent("vorp:UpdateRecipes")
 AddEventHandler("vorp:UpdateRecipes", function(recipes)
     Config.Crafting = recipes
 end)
+
+RegisterNetEvent("vorp:UpdateLocations")
+AddEventHandler("vorp:UpdateLocations", function(locations)
+    --for key, value in pairs(locations) do
+    --    print(value.name)
+    --end
+    Config.Locations = locations
+    --for key, value in pairs(Config.Locations) do
+    --    print(value.name, value.id, value.Job)
+    --end
+end)
