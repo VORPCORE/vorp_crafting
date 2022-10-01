@@ -10,6 +10,20 @@ VUI.OpenUI = function (location)
         uiopen = true
         local playerPed = PlayerPedId()
 
+        local Categories = {}
+
+        if location.Categories == 0 then
+           Categories=Config.Categories
+        else
+            for keyloc, loccat in pairs(location.Categories) do
+                for keycat, cat in pairs(Config.Categories) do
+                    if loccat == cat.ident then
+                        Categories[#Categories+1] = cat
+                        break
+                    end
+                end
+            end
+        end
 
         if Config.KneelingAnimation then
             Animations.forceRestScenario(true)
@@ -17,7 +31,7 @@ VUI.OpenUI = function (location)
         SendNUIMessage({
             type = 'vorp-craft-open',
             craftables = Config.Crafting,
-            categories = Config.Categories,
+            categories = Categories,
             crafttime = Config.CraftTime,
             style = Config.Styles,
             language = allText,

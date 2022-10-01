@@ -1,3 +1,7 @@
+<1.6>
+- Bugfix adding recipes from other scripts
+- New functions in api to add and remove crafting locations from other scripts
+- Specific Categories from locations
 <1.5>
 - Exploit fixed
 - New config for allowing items to stay in inventory on use

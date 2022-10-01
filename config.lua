@@ -44,7 +44,8 @@ Config.Locations = {
         z = 43.573,
         Blip = {
             Hash = 1754365229
-        }
+        },
+        Categories = 0, -- set to 0 to allow all categories or like {"food"} to restrict
     }
 }
 
