@@ -12,7 +12,7 @@ VUI.OpenUI = function (location)
 
         local Categories = {}
 
-        if location.Categories == 0 then
+        if location.Categories == 0 or location.Categories == nil then
            Categories=Config.Categories
         else
             for keyloc, loccat in pairs(location.Categories) do
