@@ -89,9 +89,15 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
                 if crafting.Type == "weapon" then
                     local ammo = { ["nothing"] = 0 }
                     local components = {}
+
+                    local count = 0
+
+                    for k, rwd in pairs(crafting.Reward) do
+                        count = count + rwd.count
+                    end
     
                     -- Check that the user can carry weapons
-                    VorpInv.canCarryWeapons(_source, 1, function(canCarryWeapons)
+                    VorpInv.canCarryWeapons(_source, count * countz, function(canCarryWeapons)
                         if canCarryWeapons  then
                             -- Delete items to crafting
                             for index, item in pairs(crafting.Items) do
@@ -99,8 +105,12 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
                             end
 
                             -- Give weapons from the crafting list
-                            for k, v in pairs(reward) do
-                                VorpInv.createWeapon(_source, v.name, ammo, components)
+                            for i = 1, countz do
+                                for k, v in pairs(reward) do
+                                    for i = 1, v.count do
+                                        VorpInv.createWeapon(_source, v.name, ammo, components)
+                                    end
+                                end
                             end
                             
                             TriggerClientEvent("vorp:crafting", _source, crafting.Animation)
