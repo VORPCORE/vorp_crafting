@@ -114,6 +114,7 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
                                 for k, v in pairs(reward) do
                                     for i = 1, v.count do
                                         VorpInv.createWeapon(_source, v.name, ammo, components)
+                                        VorpCore.AddWebhook(GetPlayerName(_source), Config.Webhook, _U('WebhookWeapon')..' '..v.name)
                                     end
                                 end
                             end
@@ -155,6 +156,7 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
                                 Character.addCurrency(crafting.CurrencyType, countx)
                             else
                                 VorpInv.addItem(_source, v.name, countx)
+                                VorpCore.AddWebhook(GetPlayerName(_source), Config.Webhook, _U('WebhookItem')..' x'..countx..' '..v.name)
                             end
                         end
 
