@@ -2,6 +2,8 @@ Config = {}
 
 Config.defaultlang = "en_lang"
 
+Config.Webhook = '' -- WEBHOOK VORPCORE
+
 -- Crafting Key
 Config.Keys = {
     G = 0x760A9C6F
