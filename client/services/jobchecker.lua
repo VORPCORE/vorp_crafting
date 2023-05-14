@@ -39,3 +39,10 @@ AddEventHandler("vorp:SelectedCharacter", function()
     appready = true
     TriggerServerEvent('vorp:findjob')
 end)
+
+AddEventHandler("vorp:onResourceStart", function(name)
+    if GetCurrentResourceName() == name then
+        appready = true
+        TriggerServerEvent('vorp:findjob')
+    end
+end)

@@ -2,7 +2,10 @@ Config = {}
 
 Config.defaultlang = "en_lang"
 Config.DevMode = false -- enable this if you want to make testes, dont leave true in live servers
-Config.Webhook = '' -- WEBHOOK VORPCORE
+Config.Webhook = ''    -- WEBHOOK VORPCORE
+
+--false uses the DB labels of the craft items, true uses the Desc field defined in the Crafting Item
+Config.UseCustomDesc = false
 
 -- Crafting Key
 Config.Keys = {
@@ -27,13 +30,13 @@ Config.Distances = {
 }
 
 -- Craftable Locations
---EXAMPLE: 
+--EXAMPLE:
 -- {
 --     name = 'Blackwater Crafting Express',
 --     id = 'blackwater',
 --     Job = { 'butcher' }, -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
---     x = -872.222, 
---     y = -1390.924, 
+--     x = -872.222,
+--     y = -1390.924,
 --     z = 43.573
 -- }
 Config.Locations = {
@@ -41,8 +44,8 @@ Config.Locations = {
         name = 'Blackwater Crafting Station',
         id = 'blackwater',
         Job = 0, -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
-        x = -872.222, 
-        y = -1390.924, 
+        x = -872.222,
+        y = -1390.924,
         z = 43.573,
         Blip = {
             enable = true,
@@ -83,16 +86,16 @@ Config.CraftingProps = {
 Config.CraftTime = 15000
 
 -- Craftable item categories. ident and Config.crafting.Category must equal eachother.
---EXAMPLE: 
+--EXAMPLE:
 -- {
---     ident = 'food', 
+--     ident = 'food',
 --     text = 'Craft Food',
 --     Location = { 'campfire' }, -- set to 0 to allow any locations from Config.Locations
 --     Job = { 'butcher' } -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
 -- },
 Config.Categories = {
     {
-        ident = 'food', 
+        ident = 'food',
         text = 'Craft Food',
         Location = 0,
         Job = 0
@@ -118,11 +121,14 @@ Config.Categories = {
 }
 
 -- Craftable Items/Rewards And their Recipes
---EXAMPLE: 
+--EXAMPLE:
 -- {
 --     Text = "Meat Bfast ",
 --     SubText = "InvMax = 10",
---     Desc = "Recipe: 1x Meat, 1x Salt",
+
+        -- can leave Desc empty if Config.UseCustomDesc is set to false
+        -- otherwise use ", " as a separator between ingredients (so it creates a Line break in the UI)
+--     Desc = "1x Meat, 1x Salt",
 --     Items = {
 --         {
 --             name = "meat",
@@ -150,7 +156,7 @@ Config.Crafting = {
     {
         Text = "Meat Bfast ",
         SubText = "InvMax = 10",
-        Desc = "Recipe: 1x Meat, 1x Salt",
+        Desc = "Recipe: 1x Meat + 1x Salt",
         Items = {
             {
                 name = "meat",
@@ -169,9 +175,9 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "item", -- indicate if it is 'weapon' or 'item'
-        Job = 0, -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
-        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        Type = "item",    -- indicate if it is 'weapon' or 'item'
+        Job = 0,          -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
+        Location = 0,     -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
         UseCurrencyMode = false,
         CurrencyType = 0, -- 0 = money, 1 = gold
         Category = "food",
@@ -181,7 +187,7 @@ Config.Crafting = {
     {
         Text = "Seasoned Small Game ",
         SubText = "InvMax = 10",
-        Desc = "Recipe: 1 x SGM, 1 x Salt",
+        Desc = "1 x SGM + 1 x Salt",
         Items = {
             {
                 name = "consumable_game",
@@ -192,7 +198,7 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "cookedsmallgame",
                 count = 2
@@ -205,7 +211,7 @@ Config.Crafting = {
         CurrencyType = 0,
         Category = "food",
         Animation = 'knifecooking'
-    }, 
+    },
     {
         Text = "Apple Pie ",
         SubText = "InvMax = 10",
@@ -283,7 +289,7 @@ Config.Crafting = {
                 name = "eggs",
                 count = 2
             }
-        }, 
+        },
         Reward = {
             {
                 name = "consumable_breakfast",
@@ -322,7 +328,7 @@ Config.Crafting = {
                 name = "flour",
                 count = 1
             }
-        }, 
+        },
         Reward = {
             {
                 name = "consumable_blueberrypie",
@@ -350,7 +356,7 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "knifecooking",
                 count = 1
@@ -481,7 +487,7 @@ Config.Crafting = {
                 count = 2
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "Axe",
                 count = 1
@@ -512,7 +518,7 @@ Config.Crafting = {
                 count = 4
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "campfire",
                 count = 1
@@ -535,7 +541,7 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "cookedbird",
                 count = 1
@@ -558,7 +564,7 @@ Config.Crafting = {
                 count = 14
             }
         },
-        Reward ={
+        Reward = {
             {
                 --name = "gold", -- if you use the currency mode, you don't need a name section inside the reward section
                 count = 1
@@ -566,7 +572,7 @@ Config.Crafting = {
         },
         Type = "item", -- indicate if it is 'weapon' or 'item'
         Job = 0,
-        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        Location = 0,  -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
         UseCurrencyMode = true,
         CurrencyType = 1,
         Category = "items"
@@ -581,7 +587,7 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "plainsmallgame",
                 count = 1
@@ -604,7 +610,7 @@ Config.Crafting = {
                 count = 10
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "rope",
                 count = 1
@@ -627,7 +633,7 @@ Config.Crafting = {
                 count = 10
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "cloth",
                 count = 1
@@ -658,7 +664,7 @@ Config.Crafting = {
                 count = 2
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "tent",
                 count = 1
@@ -689,7 +695,7 @@ Config.Crafting = {
                 count = 2
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "bedroll",
                 count = 1
@@ -701,7 +707,7 @@ Config.Crafting = {
         UseCurrencyMode = false,
         CurrencyType = 0,
         Category = "items"
-    }, 
+    },
     {
         Text = "Cigar",
         SubText = "InvMax = 20",
@@ -716,7 +722,7 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "cigar",
                 count = 1
@@ -743,7 +749,7 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "cigarette",
                 count = 1
@@ -755,7 +761,7 @@ Config.Crafting = {
         UseCurrencyMode = false,
         CurrencyType = 0,
         Category = "items"
-    }, 
+    },
     {
         Text = "Steak n' Eggs ",
         SubText = "InvMax = 10",
@@ -774,7 +780,7 @@ Config.Crafting = {
                 count = 2
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "steakeggs",
                 count = 1
@@ -786,7 +792,7 @@ Config.Crafting = {
         UseCurrencyMode = false,
         CurrencyType = 0,
         Category = "food"
-    }, 
+    },
     {
         Text = "Veggie Stew ",
         SubText = "InvMax = 10",
@@ -813,7 +819,7 @@ Config.Crafting = {
                 count = 2
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "vegstew",
                 count = 1
@@ -825,7 +831,7 @@ Config.Crafting = {
         UseCurrencyMode = false,
         CurrencyType = 0,
         Category = "food"
-    },   
+    },
     {
         Text = "Porkchops and Applesauce ",
         SubText = "InvMax = 10",
@@ -840,7 +846,7 @@ Config.Crafting = {
                 count = 2
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "porknapples",
                 count = 1
@@ -879,7 +885,7 @@ Config.Crafting = {
                 count = 2
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "birdstew",
                 count = 1
@@ -918,7 +924,7 @@ Config.Crafting = {
                 count = 2
             }
         },
-        Reward ={
+        Reward = {
             {
                 name = "birdstew",
                 count = 1
@@ -946,17 +952,18 @@ Config.Crafting = {
                 count = 4
             },
         },
-        Reward ={
+        Reward = {
             {
                 name = "WEAPON_BOW_IMPROVED",
                 count = 1
             }
         },
         Type = "weapon", -- indicate if it is 'weapon' or 'item'
-        Job = 0, 
+        Job = 0,
         Location = 0,
         Category = "weapons",
-        Animation = 'craft' -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
+        Animation =
+        'craft'             -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
     },
     {
         Text = "Revolver Navy ",
@@ -982,11 +989,12 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "weapon", -- indicate if it is 'weapon' or 'item'
-        Job = 0, -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
-        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        Type = "weapon",    -- indicate if it is 'weapon' or 'item'
+        Job = 0,            -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
+        Location = 0,       -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
         Category = "weapons",
-        Animation = 'craft' -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
+        Animation =
+        'craft'             -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
     },
     {
         Text = "Knife ",
@@ -1008,18 +1016,19 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "weapon", -- indicate if it is 'weapon' or 'item'
-        Job = 0, -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
-        Location = 0, -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        Type = "weapon",    -- indicate if it is 'weapon' or 'item'
+        Job = 0,            -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
+        Location = 0,       -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
         Category = "meleeweapons",
-        Animation = 'craft' -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
+        Animation =
+        'craft'             -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
     },
 }
 
 Config.Animations = {
     ["craft"] = { --Default Animation
         dict = "mech_inventory@crafting@fallbacks",
-        name = "full_craft_and_stow", 
+        name = "full_craft_and_stow",
         flag = 27,
         type = 'standard'
     },
@@ -1031,7 +1040,7 @@ Config.Animations = {
         prop = {
             model = 'p_stick04x',
             coords = {
-                x = 0.2, 
+                x = 0.2,
                 y = 0.04,
                 z = 0.12,
                 xr = 170.0,
@@ -1042,7 +1051,7 @@ Config.Animations = {
             subprop = {
                 model = 's_meatbit_chunck_medium01x',
                 coords = {
-                    x = -0.30, 
+                    x = -0.30,
                     y = -0.08,
                     z = -0.30,
                     xr = 0.0,
@@ -1054,13 +1063,13 @@ Config.Animations = {
     },
     ["knifecooking"] = {
         dict = "amb_camp@world_player_fire_cook_knife@male_a@wip_base",
-        name = "wip_base", 
+        name = "wip_base",
         flag = 17,
         type = 'standard',
         prop = {
             model = 'w_melee_knife06',
             coords = {
-                x = -0.01, 
+                x = -0.01,
                 y = -0.02,
                 z = 0.02,
                 xr = 190.0,
@@ -1071,7 +1080,7 @@ Config.Animations = {
             subprop = {
                 model = 'p_redefleshymeat01xa',
                 coords = {
-                    x = 0.00, 
+                    x = 0.00,
                     y = 0.02,
                     z = -0.20,
                     xr = 0.0,
@@ -1083,8 +1092,8 @@ Config.Animations = {
     },
     ["campfire"] = {
         dict = "script_campfire@lighting_fire@male_male",
-        name = "light_fire_b_p2_male_b", 
+        name = "light_fire_b_p2_male_b",
         flag = 17,
         type = 'standard'
-	}
+    }
 }

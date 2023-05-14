@@ -98,7 +98,7 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
 
                     -- Check that the user can carry weapons
                     VorpInv.canCarryWeapons(_source, count * countz, function(canCarryWeapons)
-                        if canCarryWeapons  then
+                        if canCarryWeapons then
                             -- Delete items to crafting
 
                             if crafting.TakeItems == nil or crafting.TakeItems == true then
@@ -114,7 +114,8 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
                                 for k, v in pairs(reward) do
                                     for i = 1, v.count do
                                         VorpInv.createWeapon(_source, v.name, ammo, components)
-                                        VorpCore.AddWebhook(GetPlayerName(_source), Config.Webhook, _U('WebhookWeapon')..' '..v.name)
+                                        VorpCore.AddWebhook(GetPlayerName(_source), Config.Webhook,
+                                            _U('WebhookWeapon') .. ' ' .. v.name)
                                     end
                                 end
                             end
@@ -122,10 +123,9 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
                             TriggerClientEvent("vorp:crafting", _source, crafting.Animation)
                         else
                             TriggerClientEvent("vorp:TipRight", _source, _U('WeaponsFull'), 3000)
-
                         end
                     end)
-                elseif crafting.Type == "item" then
+                elseif crafting.Type == "item" or crafting.Type == nil then
                     local addcount = 0
 
                     if not crafting.UseCurrencyMode then
@@ -139,7 +139,6 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
                     -- Check if there is enought room in inventory in general
                     local invAvailable = VorpInv.canCarryItems(_source, addcount - subcount)
                     if crafting.UseCurrencyMode or (invAvailable and cancarry) then
-
                         if crafting.TakeItems == nil or crafting.TakeItems == true then
                             -- Loop through and remove each item
                             for index, item in pairs(crafting.Items) do
@@ -156,7 +155,8 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
                                 Character.addCurrency(crafting.CurrencyType, countx)
                             else
                                 VorpInv.addItem(_source, v.name, countx)
-                                VorpCore.AddWebhook(GetPlayerName(_source), Config.Webhook, _U('WebhookItem')..' x'..countx..' '..v.name)
+                                VorpCore.AddWebhook(GetPlayerName(_source), Config.Webhook,
+                                    _U('WebhookItem') .. ' x' .. countx .. ' ' .. v.name)
                             end
                         end
 
@@ -169,8 +169,43 @@ AddEventHandler('vorp:startcrafting', function(craftable, countz)
                 TriggerClientEvent("vorp:TipRight", _source, _U('NotEnough'), 3000)
             end
         end
-        
     else
         TriggerClientEvent("vorp:TipRight", _source, _U('NotJob'), 3000)
     end
+end)
+
+RegisterNetEvent("crafting:getRuntimeConfig")
+AddEventHandler("crafting:getRuntimeConfig", function()
+    local src = source
+    local crafts = Config.Crafting
+    crafts.labels = {}
+    local idList = {}
+
+    for _, craft in ipairs(crafts) do
+        for _, item in ipairs(craft.Items) do
+            idList[item.name] = true
+        end
+        for _, reward in ipairs(craft.Reward) do
+            idList[reward.name] = true
+        end
+    end
+    local uniqueNames = {}
+    for name, _ in pairs(idList) do
+        -- In VorpInventory => Client => Utils.lua, ther is a method `GetWeaponLabel` that retreives a label from the HashString of the weapons
+        -- I copied it as a methods to vorp_inventoryApi (self.GetWeaponLabel) so it can be used to retrieve weapons labels server side.
+        if name:match("WEAPON") and VorpInv.GetWeaponLabel then
+            crafts.labels[name] = { label = VorpInv.GetWeaponLabel(name), limit = 1 }
+        else
+            table.insert(uniqueNames, name)
+        end
+    end
+
+    local query = string.format("SELECT `item`,`label` FROM items WHERE item IN (%s)", "'" .. table.concat(uniqueNames, "','") .. "'")
+    exports.oxmysql:execute(query, nil,
+        function(infoList)
+            for _, item in ipairs(infoList) do
+                crafts.labels[item.item] = { label = item.label, limit = item.limit }
+            end
+            TriggerClientEvent("crafting:setRuntimeConfig", src, crafts.labels)
+        end)
 end)

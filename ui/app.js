@@ -19,6 +19,7 @@ createApp({
       location: {},
       categories: [],
       consumables: {},
+      labels: [],
       currentRoute: 'home',
       activeCraftable: null,
       quantity: 1,
@@ -31,29 +32,29 @@ createApp({
           SubText: "InvMax = 10",
           Desc: "Recipe: 1x Apple, 1x Water, 1x Sugar, 1x Egg, 1x Flour",
           Items: [
-              {
-                  name: "meat",
-                  count: 1
-              },
-              {
-                  name: "salt",
-                  count: 1
-              }
+            {
+              name: "meat",
+              count: 1
+            },
+            {
+              name: "salt",
+              count: 1
+            }
           ],
           Reward: [
-              {
-                  name: "consumable_breakfast",
-                  count: 1
-              }
+            {
+              name: "consumable_breakfast",
+              count: 1
+            }
           ],
-          Job: 0, 
+          Job: 0,
           Location: 0,
           Category: "food"
         }
       ],
       testCategory: [
         {
-          ident: 'food', 
+          ident: 'food',
           text: 'Craft Food',
           Job: 0,
           Location: 0
@@ -106,7 +107,7 @@ createApp({
     fontClass() {
       let fontc = {}
 
-      switch(this.style.fontSize) {
+      switch (this.style.fontSize) {
         case 's':
           fontc['smallfont'] = true
           break;
@@ -117,22 +118,37 @@ createApp({
           fontc['largefont'] = true
           break;
         default:
-          break; 
+          fontc['mediumfont'] = true
+          break;
       }
 
       return fontc
     },
     InputCraftText() {
-      return  this.activeCraftable.Text && this.language.InputHeader ? this.language.InputHeader.replace('{{msg}}', this.activeCraftable.Text) : ''
+      return this.activeCraftable.Text && this.language.InputHeader ? this.language.InputHeader.replace('{{msg}}', this.activeCraftable.Text) : ''
     },
     Ingredients() {
-      if (this.desc.show == false) return ''
-      return this.desc.data.Desc.replace('Recipe: ', '').replace('Recipe ', '').split(',')
+      if (this.desc.show == false) return '';
+      let str = [];
+      if (this.useDesc) {
+        return this.desc.data.Desc.replace('Recipe: ', '').replace('Recipe ', '').split(',')
+      }
+      else {
+        const craft = this.desc.data;
+        craft.Items.forEach(item => {
+          str.push(`${item.count} ${this.labels[item.name]?.label || item.name}`)
+        });
+        str.push(`=`);
+        craft.Reward.forEach(item => {
+          str.push(`${item.count} ${this.labels[item.name]?.label || item.name}`)
+        });
+        return str;
+      }
     }
   },
   methods: {
     onMessage(event) {
-      switch(event.data.type) {
+      switch (event.data.type) {
         case "vorp-craft-open":
           this.setData(event.data)
           this.visible = true;
@@ -162,8 +178,8 @@ createApp({
     },
     animationPlaying() {
       this.visible = false
-        
-      setTimeout(()=>{
+
+      setTimeout(() => {
         this.visible = true
       }, this.crafttime);
     },
@@ -189,31 +205,31 @@ createApp({
     },
     formatQuantity() {
       if (this.quantity <= this.min - 1) {
-          this.quantity = this.min
+        this.quantity = this.min
       }
 
       if (this.quantity > this.max) {
-          this.quantity = this.max
+        this.quantity = this.max
       }
     },
     increase() {
-        let value = this.quantity
-        value = isNaN(value) ? this.min : value;
+      let value = this.quantity
+      value = isNaN(value) ? this.min : value;
 
-        if (value >= this.max) {
-            value = this.max - 1
-        }
+      if (value >= this.max) {
+        value = this.max - 1
+      }
 
-        value++;
-        this.quantity = value
+      value++;
+      this.quantity = value
     },
     decrease() {
-        let value = this.quantity
-        value = isNaN(value) ? this.min : value;
-        value < this.min ? value = this.min : '';
-        value--;
-        value < this.min ? value = this.min : '';
-        this.quantity = value
+      let value = this.quantity
+      value = isNaN(value) ? this.min : value;
+      value < this.min ? value = this.min : '';
+      value--;
+      value < this.min ? value = this.min : '';
+      this.quantity = value
     },
     closeView() {
       this.visible = false;
@@ -222,13 +238,15 @@ createApp({
       })
     },
     setData(data) {
-      let craftables = data.craftables
-      let categories = data.categories
-      let crafttime = data.crafttime
-      let style = data.style
-      let language = data.language
-      let location = data.location
-      let job = data.job
+      let craftables = data.craftables;
+      let categories = data.categories;
+      let crafttime = data.crafttime;
+      let style = data.style;
+      let language = data.language;
+      let location = data.location;
+      let job = data.job;
+      this.labels = data.labels;
+      this.useDesc = data.useDesc;
 
       let consumables = {}
       let filteredcat = []
@@ -269,8 +287,6 @@ createApp({
         }
       });
 
-
-
       // Fill object created above
       craftables.forEach(item => {
         let jobcheck = false
@@ -291,7 +307,7 @@ createApp({
         if (jobcheck == true) {
           // Filter out locations
           if (item.Location == 0) {
-            if (consumables[item.Category]){
+            if (consumables[item.Category]) {
               consumables[item.Category].push(item)
             }
           } else {
@@ -300,13 +316,13 @@ createApp({
             for (pos; pos < l; pos++) {
               let loc = item.Location[pos]
               if (loc == location?.id) {
-                if (consumables[item.Category]){
+                if (consumables[item.Category]) {
                   consumables[item.Category].push(item)
                 }
                 break
               }
             }
-          } 
+          }
         }
       });
 

@@ -1,7 +1,12 @@
 uiopen = false
 
 VUI = {}
-
+RuntimeConfig = {}
+RegisterNetEvent("crafting:setRuntimeConfig")
+AddEventHandler("crafting:setRuntimeConfig", function(runtimeConfig)
+    RuntimeConfig = runtimeConfig
+    print("Received runtime config length " .. #RuntimeConfig)
+end)
 -- openUI
 VUI.OpenUI = function (location)
     local allText = _all()
@@ -28,15 +33,18 @@ VUI.OpenUI = function (location)
         if Config.KneelingAnimation then
             Animations.forceRestScenario(true)
         end
+
         SendNUIMessage({
             type = 'vorp-craft-open',
             craftables = Config.Crafting,
+            labels = RuntimeConfig,
             categories = Categories,
             crafttime = Config.CraftTime,
             style = Config.Styles,
             language = allText,
             location = location,
-            job = job
+            job = job,
+            useDesc = Config.UseCustomDesc
         })
         SetNuiFocus(true, true)
     end

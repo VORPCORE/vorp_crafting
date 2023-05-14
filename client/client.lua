@@ -5,12 +5,10 @@ progressbar = exports.vorp_progressbar:initiate()
 local iscrafting = false
 local blipsadded = false
 
-if Config.DevMode then
-    RegisterCommand("crafttest",function()
-        appready = true
-        TriggerServerEvent('vorp:findjob')
-    end)
-end
+--Admin command for testing purposes
+RegisterCommand("craft", function()
+    VUI.OpenUI({ id = "campfire" })
+end, true)
 
 Citizen.CreateThread(function()
     UIPrompt.initialize()
@@ -21,21 +19,22 @@ Citizen.CreateThread(function()
             -- Check for craftable object starters
             local player = PlayerPedId()
             local Coords = GetEntityCoords(player)
-            
-            if  Config.CraftingPropsEnabled then
+
+            if Config.CraftingPropsEnabled then
                 local propjobcheck = CheckJob(Config.CampfireJobLock)
                 for k, v in pairs(Config.CraftingProps) do
                     if propjobcheck and iscrafting == false and uiopen == false then
-                        local campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(v.prop), 0) --This is resource intensive, but not sure there is a way around this.
+                        local campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z,
+                            Config.Distances.campfire, GetHashKey(v.prop), 0)                                                                          --This is resource intensive, but not sure there is a way around this.
                         if campfire then
                             UIPrompt.activate(v.title)
-        
+
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, CraftPrompt) then
-                                VUI.OpenUI({ id = v.title:lower()})
+                                VUI.OpenUI({ id = v.title:lower() })
                             end
-                        end 
+                        end
                     end
-                end 
+                end
             end
 
             -- Check for craftable location starters
@@ -46,15 +45,15 @@ Citizen.CreateThread(function()
                     if loc.Blip and blipsadded == false and loc.Blip.enable then
                         blipcount = blipcount + 1
                         Blips.addBlipForCoords(k, loc.name, loc.Blip.Hash, loc.x, loc.y, loc.z)
-                    end                
-                    
-                    local dist = getCoordDistance(loc, Coords)
+                    end
+
+                    local dist = GetCoordDistance(loc, Coords)
                     if Config.Distances.locations > dist then
                         UIPrompt.activate(loc.name)
                         if Citizen.InvokeNative(0xC92AC953F0A982AE, CraftPrompt) then
                             VUI.OpenUI(loc)
                         end
-                    end 
+                    end
                 end
             end
 
@@ -82,7 +81,7 @@ AddEventHandler("vorp:crafting", function(animation)
     end
 
     Animations.playAnimation(playerPed, animation)
-    progressbar.start(_U('Crafting'), Config.CraftTime, function ()
+    progressbar.start(_U('Crafting'), Config.CraftTime, function()
         Animations.endAnimation(animation)
 
         TriggerEvent("vorp:TipRight", _U('FinishedCrafting'), 4000)
@@ -100,4 +99,16 @@ end)
 RegisterNetEvent("vorp:UpdateLocations")
 AddEventHandler("vorp:UpdateLocations", function(locations)
     Config.Locations = locations
+end)
+
+AddEventHandler("onClientResourceStart", function(name)
+    if name == GetCurrentResourceName() and not Config.UseCustomDesc then
+        TriggerServerEvent("crafting:getRuntimeConfig")
+    end
+end)
+
+AddEventHandler("onResourceStart", function(name)
+    if name == GetCurrentResourceName() and not Config.UseCustomDesc then
+        TriggerServerEvent("crafting:getRuntimeConfig")
+    end
 end)

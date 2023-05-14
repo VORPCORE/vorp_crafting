@@ -15,7 +15,7 @@ function placeCampfire()
         Animations.endAnimations() 
         local x,y,z = table.unpack(GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 2.0, -1.55))
         
-        local prop = CreateObject(GetHashKey(Config.PlaceableCampfire), x, y, z, true, false, true)
+        local prop = Citizen.InvokeNative("0x509D5878EB39E842", GetHashKey(Config.PlaceableCampfire), x, y, z, true, true, false) --createObject
         SetEntityHeading(prop, GetEntityHeading(PlayerPedId()))
         PlaceObjectOnGroundProperly(prop)
         campfire = prop
