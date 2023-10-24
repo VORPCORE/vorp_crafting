@@ -228,7 +228,7 @@ createApp({
       let style = data.style
       let language = data.language
       let location = data.location
-      let job = data.job
+      let charJob = data.job
 
       let consumables = {}
       let filteredcat = []
