@@ -26,7 +26,17 @@ Citizen.CreateThread(function()
                 local propjobcheck = CheckJob(Config.CampfireJobLock)
                 for k, v in pairs(Config.CraftingProps) do
                     if propjobcheck and iscrafting == false and uiopen == false then
-                        local campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(v.prop), 0) --This is resource intensive, but not sure there is a way around this.
+                        local campfire = false
+                        if type(v.prop) == "table" then
+                            for kk, vv in pairs(v.prop) do
+                                print(GetHashKey(vv))
+                                campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(vv), 0)
+                                print(campfire)
+                                if campfire then break end
+                            end
+                        else
+                            campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(v.prop), 0) --This is resource intensive, but not sure there is a way around this.
+                        end
                         if campfire then
                             UIPrompt.activate(v.title)
         
