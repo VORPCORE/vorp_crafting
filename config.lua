@@ -72,7 +72,7 @@ Config.CraftingPropsEnabled = true
 Config.CraftingProps = {
     {
         title = "Campfire",
-        prop = "p_campfire05x"
+        prop = { "p_campfire01x", "p_campfire05x" } -- Can be a table or a string
     },
     {
         title = "Oven",
