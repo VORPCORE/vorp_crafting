@@ -49,7 +49,7 @@ Citizen.CreateThread(function()
             local blipcount = 0
             for k, loc in ipairs(Config.Locations) do
                 local jobcheck = CheckJob(loc.Job)
-                if jobcheck and uiopen == false then
+                if jobcheck and uiopen == false and IsEntityDead(player) == false then
                     if loc.Blip and blipsadded == false and loc.Blip.enable then
                         blipcount = blipcount + 1
                         Blips.addBlipForCoords(k, loc.name, loc.Blip.Hash, loc.x, loc.y, loc.z)
