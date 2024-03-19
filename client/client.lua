@@ -25,7 +25,7 @@ Citizen.CreateThread(function()
             if  Config.CraftingPropsEnabled then
                 local propjobcheck = CheckJob(Config.CampfireJobLock)
                 for k, v in pairs(Config.CraftingProps) do
-                    if propjobcheck and iscrafting == false and uiopen == false then
+                    if propjobcheck and iscrafting == false and uiopen == false and IsEntityDead(player) == false then
                         if type(v.prop) == "table" then
                             for kk, vv in pairs(v.prop) do
                                 campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(vv), 0)
