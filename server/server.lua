@@ -3,25 +3,25 @@ local VorpInv = exports.vorp_inventory:vorp_inventoryApi()
 
 CreateThread(function()
     local item = Config.CampFireItem
-    exports.vorp_inventory:RegisterUsableItem(item, function(data)
+    exports.vorp_inventory:registerUsableItem(item, function(data)
         VorpInv.subItem(data.source, item, 1)
         TriggerClientEvent("vorp:campfire", data.source)
     end)
 end)
 
---!this needs a callback
+
 Core.Callback.Register("vorp_crafting:GetJob", function(source, cb)
     local Character = Core.getUser(source).getUsedCharacter
     local job = Character.job
     cb(job)
 end)
 
-RegisterServerEvent('vorp:openInv', function()
+RegisterNetEvent('vorp:openInv', function()
     local _source = source
     exports.vorp_inventory:openInventory(_source)
 end)
 
-RegisterServerEvent('vorp:startcrafting', function(craftable, countz)
+RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
     local _source = source
     local Character = Core.getUser(_source).getUsedCharacter
 
