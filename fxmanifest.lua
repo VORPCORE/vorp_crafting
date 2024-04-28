@@ -15,13 +15,11 @@ shared_scripts {
 }
 client_scripts {
     'client/client.lua',
-    'client/functions.lua',
     'client/services/*.lua'
 }
 server_scripts {
     'server/server.lua',
     'server/apis/events.lua',
-    'server/functions.lua'
 }
 files {
     'ui/*',
