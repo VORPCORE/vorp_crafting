@@ -73,7 +73,7 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
 
     local craftcheck = true
     for index, item in pairs(crafting.Items) do
-        local pcount = exports.vorp_inventory:getItemCount(_source, item.name)
+        local pcount = exports.vorp_inventory:getItemCount(_source, nil, item.name)
         local icount = item.count * countz
         if pcount < icount then
             craftcheck = false
