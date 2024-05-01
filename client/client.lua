@@ -25,12 +25,17 @@ CreateThread(function()
                         for kk, vv in pairs(v.prop) do
                             campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z,
                                 Config.Distances.campfire, GetHashKey(vv), false)
-                            if campfire then break end
+                            if not campfire then
+                                break
+                            end
                         end
                     else
                         local prop = v.prop --[[@as string]]
                         campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire,
                             GetHashKey(prop), false)
+                        if not campfire then
+                            break
+                        end
                     end
 
                     if campfire then
