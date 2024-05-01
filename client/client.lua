@@ -63,6 +63,7 @@ CreateThread(function()
 
                 local dist = GetCoordDistance(loc, Coords)
                 if Config.Distances.locations > dist then
+                    sleep = 0
                     UIPrompt.activate(loc.name)
                     if Citizen.InvokeNative(0xC92AC953F0A982AE, CraftPrompt) then
                         local jobcheck = CheckJob(loc.Job)
