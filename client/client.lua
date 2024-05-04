@@ -23,19 +23,14 @@ CreateThread(function()
                 if iscrafting == false and uiopen == false and IsEntityDead(player) == false then
                     if type(v.prop) == "table" then
                         for kk, vv in pairs(v.prop) do
-                            campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z,
-                                Config.Distances.campfire, GetHashKey(vv), false)
-                            if not campfire then
-                                break
-                            end
+                            campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z,   Config.Distances.campfire, GetHashKey(vv), false)
                         end
+                        if not campfire then break end
                     else
                         local prop = v.prop --[[@as string]]
                         campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire,
                             GetHashKey(prop), false)
-                        if not campfire then
-                            break
-                        end
+                        if not campfire then break end
                     end
 
                     if campfire then
