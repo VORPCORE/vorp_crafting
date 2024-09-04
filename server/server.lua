@@ -1,10 +1,9 @@
 local Core = exports.vorp_core:GetCore()
-local VorpInv = exports.vorp_inventory:vorp_inventoryApi()
 
 CreateThread(function()
     local item = Config.CampFireItem
     exports.vorp_inventory:registerUsableItem(item, function(data)
-        VorpInv.subItem(data.source, item, 1)
+        exports.vorp_inventory:subItem(data.source, item, 1)
         TriggerClientEvent("vorp:campfire", data.source)
     end)
 end)
@@ -155,8 +154,7 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
                     Character.addCurrency(crafting.CurrencyType, countx)
                 else
                     exports.vorp_inventory:addItem(_source, v.name, countx)
-                    Core.AddWebhook(GetPlayerName(_source), Config.Webhook,
-                        _U('WebhookItem') .. ' x' .. countx .. ' ' .. v.name)
+                    Core.AddWebhook(GetPlayerName(_source), Config.Webhook, _U('WebhookItem') .. ' x' .. countx .. ' ' .. v.name)
                 end
             end
 
