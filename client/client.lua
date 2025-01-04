@@ -9,7 +9,7 @@ local function GetCoordDistance(v1, v2)
 end
 
 CreateThread(function()
-    repeat Wait(1000) until LocalPlayer.state.IsInSession
+    repeat Wait(4000) until LocalPlayer.state.IsInSession
     UIPrompt.initialize()
 
     while true do
@@ -19,11 +19,11 @@ CreateThread(function()
         local campfire = false
 
         if Config.CraftingPropsEnabled and CheckJobClient(Config.CampfireJobLock) then -- dont allow check if player dont have job
-            for k, v in pairs(Config.CraftingProps) do
+            for _, v in pairs(Config.CraftingProps) do
                 if iscrafting == false and uiopen == false and IsEntityDead(player) == false then
                     if type(v.prop) == "table" then
-                        for kk, vv in pairs(v.prop) do
-                            campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z,   Config.Distances.campfire, GetHashKey(vv), false)
+                        for _, vv in pairs(v.prop) do
+                            campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(vv), false)
                             if campfire then break end
                         end
                     else
@@ -36,7 +36,7 @@ CreateThread(function()
                     if campfire then
                         sleep = 0
                         UIPrompt.activate(v.title)
-                        if Citizen.InvokeNative(0xC92AC953F0A982AE, CraftPrompt) then
+                        if UiPromptHasStandardModeCompleted(CraftPrompt, 0) then
                             local jobcheck = CheckJob(Config.CampfireJobLock) -- security check
                             if jobcheck then
                                 VUI.OpenUI({ id = v.title:lower() })
@@ -60,8 +60,8 @@ CreateThread(function()
                 if Config.Distances.locations > dist then
                     sleep = 0
                     UIPrompt.activate(loc.name)
-                    if Citizen.InvokeNative(0xC92AC953F0A982AE, CraftPrompt) then
-                        local jobcheck = CheckJob(loc.Job)
+                    if UiPromptHasStandardModeCompleted(CraftPrompt, 0) then
+                        jobcheck = CheckJob(loc.Job)
                         if jobcheck then
                             VUI.OpenUI(loc)
                         end
@@ -75,7 +75,7 @@ CreateThread(function()
         end
 
         if (uiopen == true or iscrafting == true) then
-            Citizen.InvokeNative(0xF1622CE88A1946FB)
+            UiPromptDisablePromptsThisFrame()
         end
 
         Wait(sleep)
@@ -100,22 +100,4 @@ AddEventHandler("vorp:crafting", function(animation)
         VUI.Refocus()
         iscrafting = false
     end)
-end)
-
---UPDATE CRAFTING RECIPES
-RegisterNetEvent("vorp:UpdateRecipes", function(recipes, bool)
-    if not bool then
-        table.insert(Config.Crafting, recipes)
-    else
-        table.remove(Config.Crafting, recipes)
-    end
-end)
-
---UPDATE CRAFTING LOCATIONS
-RegisterNetEvent("vorp:UpdateLocations", function(location, bool)
-    if not bool then
-        table.insert(Config.Locations, location)
-    else
-        table.remove(Config.Locations, location)
-    end
 end)
