@@ -31,16 +31,16 @@ AddEventHandler('vorp:campfire', function()
 end)
 
 if Config.Commands.campfire == true then
-    RegisterCommand("campfire", function(source, args, rawCommand)
+    RegisterCommand("campfire", function()
         placeCampfire()
     end, false)
 end
 
 if Config.Commands.extinguish == true then
-    RegisterCommand('extinguish', function(source, args, rawCommand)
+    RegisterCommand('extinguish', function()
         if campfire ~= 0 then
             SetEntityAsMissionEntity(campfire, false, false)
-            TaskStartScenarioInPlaceHash(PlayerPedId(), GetHashKey('WORLD_HUMAN_BUCKET_POUR_LOW'), 7000, true, 0, 0,   false)
+            TaskStartScenarioInPlaceHash(PlayerPedId(), GetHashKey('WORLD_HUMAN_BUCKET_POUR_LOW'), 7000, true, 0, 0, false)
             TriggerEvent("vorp:TipRight", _U('PutOutFire'), 7000)
             Wait(7000)
             ClearPedTasksImmediately(PlayerPedId())

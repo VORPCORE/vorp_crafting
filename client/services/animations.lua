@@ -63,5 +63,3 @@ end
 Animations.forceRestScenario = function(val)
     Citizen.InvokeNative(0xE5A3DD2FF84E1A4B, val)
 end
-
-

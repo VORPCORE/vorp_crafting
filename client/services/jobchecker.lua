@@ -7,7 +7,7 @@ function CheckJob(joblist)
     end
 
     if joblist ~= 0 then
-        for k, v in pairs(joblist) do
+        for _, v in pairs(joblist) do
             if v == job then
                 return true
             end
@@ -23,7 +23,7 @@ function CheckJobClient(joblist)
     end
 
     if joblist ~= 0 then
-        for k, v in pairs(joblist) do
+        for _, v in pairs(joblist) do
             if v == LocalPlayer.state.Character.Job then
                 return true
             end
