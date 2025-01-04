@@ -31,15 +31,6 @@ Config.Distances = {
 }
 
 -- Craftable Locations
---EXAMPLE:
--- {
---     name = 'Blackwater Crafting Express',
---     id = 'blackwater',
---     Job = { 'butcher' }, -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
---     x = -872.222,
---     y = -1390.924,
---     z = 43.573
--- }
 Config.Locations = {
     {
         name = 'Blackwater Crafting Station',
@@ -87,19 +78,12 @@ Config.CraftingProps = {
 Config.CraftTime = 15000
 
 -- Craftable item categories. ident and Config.crafting.Category must equal eachother.
---EXAMPLE:
--- {
---     ident = 'food',
---     text = 'Craft Food',
---     Location = { 'campfire' }, -- set to 0 to allow any locations from Config.Locations
---     Job = { 'butcher' } -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
--- },
 Config.Categories = {
     {
         ident = 'food',
         text = 'Craft Food',
-        Location = 0,
-        Job = 0
+        Location = 0, -- set to 0 to allow any locations from Config.Locations
+        Job = 0       -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
     },
     {
         ident = 'items',
@@ -130,11 +114,15 @@ Config.Categories = {
 --     Items = {
 --         {
 --             name = "meat",
---             count = 1
+--             count = 1,
+--             take = true, -- remove this item ? could be a tool
+--             canUseDecay = 10 -- can this item be accpet if it has decay and  what minimum percentage? if item has more or equals to 10 percentage decay it will accept to be crafted, remove if not
 --         },
 --         {
 --             name = "salt",
---             count = 1
+--             count = 1,
+--             take = false, -- remove this item?
+--             canUseDecay = 10 -- can this item be accpet if it has decay and  what minimum percentage? if item has more or equals to 10 percentage decay it will accept to be crafted, remove if not
 --         }
 --     },
 --     Reward = {
@@ -155,16 +143,18 @@ Config.Crafting = {
         Text = "Meat Bfast ",
         SubText = "InvMax = 10",
         Desc = "Recipe: 1x Meat, 1x Salt",
-        Items = {
+        Items = { -- items required to craft
             {
                 name = "meat",
                 count = 1,
-                take = true -- This determines if recipe items will be taken from inventory after crafting. If ommited, it will default to true.
+                take = true,     -- remove this item ? could be a tool
+                canUseDecay = 10 -- can this item be accpet if it has decay and  what minimum percentage? if item has more or equals to 10 percentage decay it will accept to be crafted, remove if not
             },
             {
                 name = "salt",
                 count = 1,
-                take = false -- This determines if recipe items will be taken from inventory after crafting. If ommited, it will default to true.
+                take = false,    -- remove this item?
+                canUseDecay = 10 -- can this item be accpet if it has decay and  what minimum percentage? if item has more or equals to 10 percentage decay it will accept to be crafted, remove if not
             }
         },
         Reward = {
@@ -961,7 +951,7 @@ Config.Crafting = {
         Location = 0,
         Category = "weapons",
         Animation =
-        'craft'             -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
+        'craft' -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
     },
     {
         Text = "Revolver Navy ",
@@ -987,12 +977,12 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "weapon",    -- indicate if it is 'weapon' or 'item'
-        Job = 0,            -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
-        Location = 0,       -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        Type = "weapon", -- indicate if it is 'weapon' or 'item'
+        Job = 0,         -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
+        Location = 0,    -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
         Category = "weapons",
         Animation =
-        'craft'             -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
+        'craft' -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
     },
     {
         Text = "Knife ",
@@ -1014,12 +1004,12 @@ Config.Crafting = {
                 count = 1
             }
         },
-        Type = "weapon",    -- indicate if it is 'weapon' or 'item'
-        Job = 0,            -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
-        Location = 0,       -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
+        Type = "weapon", -- indicate if it is 'weapon' or 'item'
+        Job = 0,         -- set to 0 to allow any jobs, or like { "butcher" } to job restriction
+        Location = 0,    -- set to 0 to allow any locations from Config.Locations, or like { "butcher" } to job restriction
         Category = "meleeweapons",
         Animation =
-        'craft'             -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
+        'craft' -- set what animation should play when crafting (if this is not set it has a default animation). Animations can be found below in Config.Animations
     },
 }
 
