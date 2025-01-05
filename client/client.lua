@@ -17,64 +17,66 @@ CreateThread(function()
         local player = PlayerPedId()
         local Coords = GetEntityCoords(player)
         local campfire = false
-
-        if Config.CraftingPropsEnabled and CheckJobClient(Config.CampfireJobLock) then -- dont allow check if player dont have job
-            for _, v in pairs(Config.CraftingProps) do
-                if iscrafting == false and uiopen == false and IsEntityDead(player) == false then
-                    if type(v.prop) == "table" then
-                        for _, vv in pairs(v.prop) do
-                            campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(vv), false)
-                            if campfire then break end
+        if (not uiopen and not iscrafting) then
+            if Config.CraftingPropsEnabled and CheckJobClient(Config.CampfireJobLock) then -- dont allow check if player dont have job
+                for _, v in pairs(Config.CraftingProps) do
+                    if iscrafting == false and uiopen == false and IsEntityDead(player) == false then
+                        if type(v.prop) == "table" then
+                            for _, vv in pairs(v.prop) do
+                                campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire, GetHashKey(vv), false)
+                                if campfire then break end
+                            end
+                        else
+                            local prop = v.prop --[[@as string]]
+                            campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire,
+                                GetHashKey(prop), false)
+                            if not campfire then break end
                         end
-                    else
-                        local prop = v.prop --[[@as string]]
-                        campfire = DoesObjectOfTypeExistAtCoords(Coords.x, Coords.y, Coords.z, Config.Distances.campfire,
-                            GetHashKey(prop), false)
-                        if not campfire then break end
-                    end
 
-                    if campfire then
-                        sleep = 0
-                        UIPrompt.activate(v.title)
-                        if UiPromptHasStandardModeCompleted(CraftPrompt, 0) then
-                            local jobcheck = CheckJob(Config.CampfireJobLock) -- security check
-                            if jobcheck then
-                                VUI.OpenUI({ id = v.title:lower() })
+                        if campfire then
+                            sleep = 0
+                            UIPrompt.activate(v.title)
+                            if UiPromptHasStandardModeCompleted(CraftPrompt, 0) then
+                                local jobcheck = CheckJob(Config.CampfireJobLock) -- security check
+                                if jobcheck then
+                                    VUI.OpenUI({ id = v.title:lower() })
+                                end
                             end
                         end
                     end
                 end
             end
-        end
 
-        local blipcount = 0
-        for k, loc in ipairs(Config.Locations) do
-            local jobcheck = CheckJobClient(loc.Job)
-            if jobcheck and uiopen == false and IsEntityDead(player) == false then
-                if loc.Blip and blipsadded == false and loc.Blip.enable then
-                    blipcount = blipcount + 1
-                    Blips.addBlipForCoords(k, loc.name, loc.Blip.Hash, loc.x, loc.y, loc.z)
-                end
+            local blipcount = 0
+            for k, loc in ipairs(Config.Locations) do
+                local jobcheck = CheckJobClient(loc.Job)
+                if jobcheck and uiopen == false and IsEntityDead(player) == false then
+                    if loc.Blip and blipsadded == false and loc.Blip.enable then
+                        blipcount = blipcount + 1
+                        Blips.addBlipForCoords(k, loc.name, loc.Blip.Hash, loc.x, loc.y, loc.z)
+                    end
 
-                local dist = GetCoordDistance(loc, Coords)
-                if Config.Distances.locations > dist then
-                    sleep = 0
-                    UIPrompt.activate(loc.name)
-                    if UiPromptHasStandardModeCompleted(CraftPrompt, 0) then
-                        jobcheck = CheckJob(loc.Job)
-                        if jobcheck then
-                            VUI.OpenUI(loc)
+                    local dist = GetCoordDistance(loc, Coords)
+                    if Config.Distances.locations > dist then
+                        sleep = 0
+                        UIPrompt.activate(loc.name)
+                        if UiPromptHasStandardModeCompleted(CraftPrompt, 0) then
+                            jobcheck = CheckJob(loc.Job)
+                            if jobcheck then
+                                VUI.OpenUI(loc)
+                            end
                         end
                     end
                 end
             end
+
+            if blipcount > 0 then
+                blipsadded = true
+            end
         end
 
-        if blipcount > 0 then
-            blipsadded = true
-        end
-
-        if (uiopen == true or iscrafting == true) then
+        if (uiopen or iscrafting) then
+            sleep = 0
             UiPromptDisablePromptsThisFrame()
         end
 
