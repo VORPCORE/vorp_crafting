@@ -1,3 +1,7 @@
+<1.8>
+- supports decay items for crafting
+- stops locations look up when crafting
+- config changed you can add minimum decay acceptable for crafting or non
 <1.7>
 - optimisation now the script runs at 0.0
 - use of new exports

@@ -3,10 +3,9 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 game "rdr3"
 
 lua54 'yes'
-author "VORP edit by @Bytesizd" -- Blue original author
+author "VORP @blue" -- edited by @Bytesizd
 repository 'https://github.com/VORPCORE/vorp_crafting'
 description 'A crafting script for vorpcore framework'
-
 
 shared_scripts {
     'config.lua',
@@ -19,7 +18,6 @@ client_scripts {
 }
 server_scripts {
     'server/server.lua',
-    'server/apis/events.lua',
 }
 files {
     'ui/*',
