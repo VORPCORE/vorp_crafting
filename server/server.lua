@@ -67,7 +67,8 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
     end
 
     local reward = crafting.Reward
-    local craftcheck = true
+    local craftcheck = false
+    local craftcheck_1 = false
     local itemsToRemove = {}
 
     local inventory = exports.vorp_inventory:getUserInventoryItems(source)
@@ -81,11 +82,8 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
                     if value.percentage >= item.canUseDecay then
                         local pcount = value.count
                         local icount = item.count * countz
-                        if pcount < icount then
-                            craftcheck = false
-                            break
-                        else
-                            -- check if this item can be taken
+                        if pcount >= icount then
+                            craftcheck = true
                             if item.take == nil or item.take == true then
                                 table.insert(itemsToRemove, { data = value, count = item.count * countz })
                             end
@@ -96,10 +94,8 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
                 if not item.canUseDecay and not value.isDegradable then
                     local pcount = value.count
                     local icount = item.count * countz
-                    if pcount < icount then
-                        craftcheck = false
-                        break
-                    else
+                    if pcount >= icount then
+                        craftcheck_1 = true
                         if item.take == nil or item.take == true then
                             table.insert(itemsToRemove, { data = value, count = item.count * countz })
                         end
@@ -109,7 +105,8 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
         end
     end
 
-    if not craftcheck then
+    -- both  must be true
+    if not craftcheck or not craftcheck_1 then
         return Core.NotifyObjective(_source, _U('NotEnough'), 5000)
     end
 
@@ -118,25 +115,26 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
         local ammo = { ["nothing"] = 0 }
         local components = {}
 
-        local count = 0
+        --[[  local count = 0
         for _, rwd in pairs(crafting.Reward) do
             count = count + rwd.count
-        end
+        end ]]
 
-        local canCarry = exports.vorp_inventory:canCarryWeapons(_source, count * countz)
-        if not canCarry then
-            return Core.NotifyObjective(_source, _U('WeaponsFull'), 5000)
+        for index, v in ipairs(reward) do
+            local canCarry = exports.vorp_inventory:canCarryWeapons(_source, v.count * countz, nil, v.name)
+            if not canCarry then
+                return Core.NotifyObjective(_source, _U('WeaponsFull'), 5000)
+            end
         end
 
         if #itemsToRemove > 0 then
             for _, value in ipairs(itemsToRemove) do
-                exports.vorp_inventory:subItemById(_source, value.data.id, nil, value.count)
+                exports.vorp_inventory:subItemById(_source, value.data.id, nil, nil, value.count)
             end
         end
 
-        -- Give weapons from the crafting list
         for _ = 1, countz do
-            for _, v in pairs(reward) do
+            for _, v in ipairs(reward) do
                 for _ = 1, v.count do
                     exports.vorp_inventory:createWeapon(_source, v.name, ammo, components)
                     Core.AddWebhook(GetPlayerName(_source), Config.Webhook, _U('WebhookWeapon') .. ' ' .. v.name)
@@ -150,7 +148,7 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
         local cancarry = false
 
         if not crafting.UseCurrencyMode then
-            for _, rwd in pairs(reward) do
+            for _, rwd in ipairs(reward) do
                 local counta = rwd.count * countz
                 addcount     = addcount + counta
                 cancarry     = exports.vorp_inventory:canCarryItem(_source, rwd.name, counta)
@@ -160,7 +158,7 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
         if crafting.UseCurrencyMode or cancarry then
             if #itemsToRemove > 0 then
                 for _, value in ipairs(itemsToRemove) do
-                    exports.vorp_inventory:subItemById(_source, value.data.id, nil, value.count)
+                    exports.vorp_inventory:subItemById(_source, value.data.id, nil, nil, value.count)
                 end
             end
 
