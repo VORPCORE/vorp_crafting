@@ -67,46 +67,58 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
     end
 
     local reward = crafting.Reward
-    local craftcheck = false
-    local craftcheck_1 = false
     local itemsToRemove = {}
+    local requiredItems = {}
+
+
+    for _, item in ipairs(crafting.Items) do
+        requiredItems[item.name] = {
+            required = item.count * countz,
+            found = 0,
+            canUseDecay = item.canUseDecay,
+            take = item.take
+        }
+    end
 
     local inventory = exports.vorp_inventory:getUserInventoryItems(source)
     if not inventory then return end
 
     for _, value in pairs(inventory) do
-        for _, item in ipairs(crafting.Items) do
-            if value.name == item.name then
-                --if can usedecay then check if theres any item with that percentage to craft
-                if item.canUseDecay and value.isDegradable then
-                    if value.percentage >= item.canUseDecay then
-                        local pcount = value.count
-                        local icount = item.count * countz
-                        if pcount >= icount then
-                            craftcheck = true
-                            if item.take == nil or item.take == true then
-                                table.insert(itemsToRemove, { data = value, count = item.count * countz })
-                            end
+        local reqItem = requiredItems[value.name]
+        if reqItem then
+            if reqItem.canUseDecay then
+                if value.isDegradable then
+                    if value.percentage >= reqItem.canUseDecay then
+                        reqItem.found = reqItem.found + value.count
+                        if reqItem.take == nil or reqItem.take == true then
+                            table.insert(itemsToRemove, { data = value, count = math.min(value.count, reqItem.required) })
                         end
+                    end
+                else
+                    reqItem.found = reqItem.found + value.count
+                    if reqItem.take == nil or reqItem.take == true then
+                        table.insert(itemsToRemove, { data = value, count = math.min(value.count, reqItem.required) })
                     end
                 end
-
-                if not item.canUseDecay and not value.isDegradable then
-                    local pcount = value.count
-                    local icount = item.count * countz
-                    if pcount >= icount then
-                        craftcheck_1 = true
-                        if item.take == nil or item.take == true then
-                            table.insert(itemsToRemove, { data = value, count = item.count * countz })
-                        end
-                    end
+            else
+                reqItem.found = reqItem.found + value.count
+                if reqItem.take == nil or reqItem.take == true then
+                    table.insert(itemsToRemove, { data = value, count = math.min(value.count, reqItem.required) })
                 end
             end
         end
     end
 
-    -- both  must be true
-    if not craftcheck or not craftcheck_1 then
+
+    local craftcheck = true
+    for itemName, data in pairs(requiredItems) do
+        if data.found < data.required then
+            craftcheck = false
+            break
+        end
+    end
+
+    if not craftcheck then
         return Core.NotifyObjective(_source, _U('NotEnough'), 5000)
     end
 
@@ -114,11 +126,6 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
     if crafting.Type == "weapon" then
         local ammo = { ["nothing"] = 0 }
         local components = {}
-
-        --[[  local count = 0
-        for _, rwd in pairs(crafting.Reward) do
-            count = count + rwd.count
-        end ]]
 
         for index, v in ipairs(reward) do
             local canCarry = exports.vorp_inventory:canCarryWeapons(_source, v.count * countz, nil, v.name)
