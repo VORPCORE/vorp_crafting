@@ -21,7 +21,12 @@ Config.Styles = {
 
 Config.Commands = {
     campfire = true,
-    extinguish = true
+    campfirecommand = "campfire",
+    RemoveCampfire = true, -- After using the command the campfire in the players inventory is deleted
+
+    extinguish = true,
+    extinguishcommand = "extinguish",
+    AddCampfire = true -- After the campfire is extinguished its added to the inventory
 }
 
 -- distance to interact with Locations and campfires

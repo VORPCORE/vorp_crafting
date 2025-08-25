@@ -31,13 +31,16 @@ AddEventHandler('vorp:campfire', function()
 end)
 
 if Config.Commands.campfire == true then
-    RegisterCommand("campfire", function()
+    RegisterCommand(Config.Commands.campfirecommand, function()
         placeCampfire()
+        if Config.Commands.RemoveCampfire then
+            TriggerServerEvent("vorp_crafting:removeCampfire")
+        end
     end, false)
 end
 
 if Config.Commands.extinguish == true then
-    RegisterCommand('extinguish', function()
+    RegisterCommand(Config.Commands.extinguishcommand, function()
         if campfire ~= 0 then
             SetEntityAsMissionEntity(campfire, false, false)
             TaskStartScenarioInPlaceHash(PlayerPedId(), GetHashKey('WORLD_HUMAN_BUCKET_POUR_LOW'), 7000, true, 0, 0, false)
@@ -46,6 +49,9 @@ if Config.Commands.extinguish == true then
             ClearPedTasksImmediately(PlayerPedId())
             DeleteObject(campfire)
             campfire = 0
+            if Config.Commands.AddCampfire then
+                TriggerServerEvent("vorp_crafting:addCampfire")
+            end
         end
     end, false)
 end

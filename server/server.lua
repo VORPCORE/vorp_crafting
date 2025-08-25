@@ -19,6 +19,14 @@ RegisterNetEvent('vorp:openInv', function()
     exports.vorp_inventory:openInventory(_source)
 end)
 
+RegisterNetEvent('vorp_crafting:addCampfire', function()
+    exports.vorp_inventory:addItem(source, Config.CampFireItem, 1)
+end)
+
+RegisterNetEvent('vorp_crafting:removeCampfire', function()
+    exports.vorp_inventory:subItem(source, Config.CampFireItem, 1)
+end)
+
 RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
     local _source = source
     local Character = Core.getUser(_source).getUsedCharacter
