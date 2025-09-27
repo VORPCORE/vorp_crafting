@@ -9,9 +9,12 @@ CreateThread(function()
 end)
 
 Core.Callback.Register("vorp_crafting:GetJob", function(source, cb)
-    local Character = Core.getUser(source).getUsedCharacter
-    local job = Character.job
-    cb(job)
+    local user = Core.getUser(source)
+    if not user or type(user.getUsedCharacter) ~= "function" then
+        cb(nil); return
+    end
+    local char = user.getUsedCharacter()
+    cb(char and char.job or nil)
 end)
 
 RegisterNetEvent('vorp:openInv', function()
@@ -21,7 +24,7 @@ end)
 
 RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
     local _source = source
-    local Character = Core.getUser(_source).getUsedCharacter
+    local Character = Core.getUser(_source).getUsedCharacter()
 
     local Webhook = '' -- Set your webhook URL here
     local function getServerCraftable()
@@ -81,7 +84,7 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
         }
     end
 
-    local inventory = exports.vorp_inventory:getUserInventoryItems(source)
+    local inventory = exports.vorp_inventory:getUserInventoryItems(_source)
     if not inventory then return end
 
     for _, value in pairs(inventory) do
@@ -109,7 +112,6 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
             end
         end
     end
-
 
     local craftcheck = true
     for itemName, data in pairs(requiredItems) do
@@ -237,7 +239,12 @@ local function trim(s)
 end
 
 -- main scan
-local LabelLUT = {}
+LabelLUT = LabelLUT or {}
+
+Core.Callback.Register("vorp_crafting:GetLabelLUT", function(source, cb)
+    cb(LabelLUT or {})
+end)
+
 local function is_weapon_name(s) return type(s)=="string" and s:upper():find("^WEAPON_") ~= nil end
 local function lower_or_nil(s) return (type(s)=="string" and s~="") and s:lower() or nil end
 
@@ -361,13 +368,6 @@ local function scan_crafting_refs()
     print("^5[INFO] When all errors are fixed, this debug output will disappear.^7")
 end
 
--- run once on start (give DB adapter a fair chance to initialize)
-if Config.CraftingDiagnostics then
-    SetTimeout(1000, function()
-        scan_crafting_refs()
-    end)
-end
-
 -- =====================================================================
 -- Item Labels LUT for Crafting, Single-init, deduplicated logging.
 -- =====================================================================
@@ -479,26 +479,29 @@ local function init_labels_lut_once()
     if _lut_inited then return end
     _lut_inited = true
 
-    -- register callback once
-    Core.Callback.Register("vorp_crafting:GetLabelLUT", function(source, cb)
-        cb(LabelLUT) -- includes items + weapons
-    end)
-
     -- initial build (items + weapons)
     LabelLUT = {}
     refresh_items_into_lut(LabelLUT)
     refresh_weapons_into_lut(LabelLUT)
 end
 
--- Call init once at load, and also from onResourceStart (guard prevents duplicates)
+-- 1) Labels will always be shown when opening the crafting menu
 init_labels_lut_once()
 
-AddEventHandler("onResourceStart", function(resName)
-    if resName == GetCurrentResourceName() then
-        CreateThread(function()
-            LabelLUT = {}
-            refresh_items_into_lut(LabelLUT)
-            refresh_weapons_into_lut(LabelLUT)
-        end)
-    end
-end)
+-- 2) Diagnostics of missing items in the database, weapons in weapons.lua and images only if Config.CraftingDiagnostics is enabled
+if Config.CraftingDiagnostics then
+    init_labels_lut_once()
+    AddEventHandler("onResourceStart", function(resName)
+        if resName == GetCurrentResourceName() then
+            CreateThread(function()
+                LabelLUT = {}
+                refresh_items_into_lut(LabelLUT)
+                refresh_weapons_into_lut(LabelLUT)
+            end)
+        end
+    end)
+
+    SetTimeout(1000, function()
+        scan_crafting_refs()
+    end)
+end
