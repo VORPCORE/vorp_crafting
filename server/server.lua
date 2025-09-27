@@ -199,7 +199,6 @@ local function db_item_exists(name)
     if not name or name == "" then return false end
     local sql = "SELECT 1 FROM items WHERE item = ? LIMIT 1"
 
-    -- oxmysql (preferred)
     if exports.oxmysql then
         if exports.oxmysql.scalarSync then
             DB_MODE = "oxmysql:scalarSync"
@@ -211,23 +210,6 @@ local function db_item_exists(name)
             DB_MODE = "oxmysql:executeSync"
             local ok, rows = pcall(function()
                 return exports.oxmysql:executeSync(sql, { name })
-            end)
-            if ok then return rows and rows[1] ~= nil end
-        end
-    end
-
-    -- mysql-async / ghmattimysql Sync
-    if MySQL and MySQL.Sync then
-        if MySQL.Sync.fetchScalar then
-            DB_MODE = "mysql-async:fetchScalar"
-            local ok, val = pcall(function()
-                return MySQL.Sync.fetchScalar(sql, { name })
-            end)
-            if ok then return val ~= nil end
-        elseif MySQL.Sync.fetchAll then
-            DB_MODE = "mysql-async:fetchAll"
-            local ok, rows = pcall(function()
-                return MySQL.Sync.fetchAll(sql, { name })
             end)
             if ok then return rows and rows[1] ~= nil end
         end
@@ -382,9 +364,8 @@ local function scan_crafting_refs()
 end
 
 -- run once on start (give DB adapter a fair chance to initialize)
-CreateThread(function()
+SetTimeout(1000, function()
     if Config.CraftingDiagnostics then
-        db_item_exists("__probe__")
         scan_crafting_refs()
     end
 end)
@@ -404,10 +385,8 @@ local function db_fetch_all(sql, params)
   if exports.oxmysql and exports.oxmysql.executeSync then
     return exports.oxmysql:executeSync(sql, params or {}) or {}
   end
-  if MySQL and MySQL.Sync and MySQL.Sync.fetchAll then
-    return MySQL.Sync.fetchAll(sql, params or {}) or {}
-  end
-  print("^7 No DB adapter (oxmysql/mysql-async). Item labels will be empty.")
+
+  print("^7 No oxmysql adapter. Item labels will be empty.")
   return {}
 end
 
@@ -537,4 +516,5 @@ AddEventHandler("onResourceStart", function(resName)
       refresh_weapons_into_lut(LabelLUT)
     end)
   end
+
 end)
