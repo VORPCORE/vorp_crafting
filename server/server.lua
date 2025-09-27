@@ -187,7 +187,9 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
     end
 end)
 
--- ===== Crafting sanity check (DB + images) =====
+-- =====================================================================
+-- =============== Crafting sanity check (DB + images) =================
+-- =====================================================================
 local INV_RES_NAME = GetConvar("vorp_inventory_resource", "vorp_inventory")
 local INV_RES_PATH = GetResourcePath(INV_RES_NAME) -- absolute path to resource folder (nil if resource not found)
 local DB_MODE = "none"
@@ -242,40 +244,51 @@ local function file_exists(path)
 end
 
 local function image_exists(name)
-    if not INV_RES_PATH then return nil end-- nil => we cannot check (resource not found), we make no noise
+    if not INV_RES_PATH then return nil end -- nil => we cannot check (resource not found), we make no noise
     local p = ("%s/html/img/items/%s.png"):format(INV_RES_PATH, name)
     return file_exists(p)
 end
 
 -- Helpers
-local function is_weapon_name(s)
-    return type(s) == "string" and s:upper():find("^WEAPON_") ~= nil
-end
-
 local function trim(s)
     return type(s) == "string" and (s:gsub("^%s+", ""):gsub("%s+$", "")) or s
 end
 
 -- main scan
+local LabelLUT = {}
+local function is_weapon_name(s) return type(s)=="string" and s:upper():find("^WEAPON_") ~= nil end
+local function lower_or_nil(s) return (type(s)=="string" and s~="") and s:lower() or nil end
+
+local function dump_table_lua(tbl)
+    if type(tbl) ~= "table" then
+        return tostring(tbl)
+    end
+    local parts = {}
+    for k,v in pairs(tbl) do
+        local key = tostring(k)
+        local val
+        if type(v) == "string" then
+            val = string.format("%q", v) -- quoted string
+        else
+            val = tostring(v)
+        end
+        table.insert(parts, key .. " = " .. val)
+    end
+    return "{ " .. table.concat(parts, ", ") .. " }"
+end
+
 local function scan_crafting_refs()
     Wait(1500) -- wait a bit for other resources to start up
 
-    local missingDB, missingIMG, malformedReward, checkedDB, checkedIMG = {}, {}, {}, {}, {}
-
-    -- one-time diagnostics
-    print(("^3[script:vorp_crafting]^7 DB adapter detected: ^5%s^7"):format(DB_MODE))
-    if INV_RES_PATH then
-        print(("^3[script:vorp_crafting]^7 inventory icons path: ^5%s/html/img/items^7"):format(INV_RES_PATH))
-    else
-        print("^3[script:vorp_crafting]^7 inventory icons path: ^1NOT FOUND (resource '" .. INV_RES_NAME .. "' missing?)^7")
-    end
+    local missingDB, missingIMG, malformedReward, missingWeapons = {}, {}, {}, {}
+    local checkedDB, checkedIMG = {}, {}
 
     for _, recipe in ipairs(Config.Crafting or {}) do
         -- 1) Ingredients
         for __, it in ipairs(recipe.Items or {}) do
             local nm = trim(it.name)
             if nm and nm ~= "" then
-                -- DB check (ingredients are always items)
+                -- DB check
                 if not checkedDB[nm] then
                     if not db_item_exists(nm) then
                         missingDB[nm] = true
@@ -283,41 +296,42 @@ local function scan_crafting_refs()
                     checkedDB[nm] = true
                 end
 
-                -- image check (optional but useful)
+                -- PNG check
                 if INV_RES_PATH and not checkedIMG[nm] then
                     local exists = image_exists(nm)
-                    if exists == false then
-                        -- Warning: item may be in the database, but PNG was forgotten
-                        -- To avoid duplication with "missed item", log only if there is one in the database
-                        if not missingDB[nm] then
-                            missingIMG[nm] = true
-                        end
+                    if exists == false and not missingDB[nm] then
+                        missingIMG[nm] = true
                     end
                     checkedIMG[nm] = true
                 end
             else
-                -- name is empty or nil
-                missingDB["<ingredient:empty>"] = true
+                malformedReward[#malformedReward+1] = ("empty ingredient in recipe: %s"):format(recipe.Text or "unknown")
             end
         end
 
         -- 2) Rewards
-        for __, r in ipairs(recipe.Reward or {}) do
+        for ridx, r in ipairs(recipe.Reward or {}) do
             local rn = trim(r.name)
             if not rn or rn == "" then
-                table.insert(malformedReward, recipe.Text or "unknown_recipe")
+                local dump = dump_table_lua(r)
+                local dbg = recipe.Text or ("index="..ridx)
+                malformedReward[#malformedReward+1] =
+                    ("malformed reward in recipe %s → %s"):format(dbg, dump)
             else
                 if recipe.Type == "weapon" and is_weapon_name(rn) then
-                    -- weapon reward → we don't touch the items and pictures database
+                    local wn = lower_or_nil(rn)
+                    if not (LabelLUT[wn] and LabelLUT[wn].label) then
+                        missingWeapons[rn] = true
+                    end
                 else
-                    -- item reward → DB
+                    -- DB check
                     if not checkedDB[rn] then
                         if not db_item_exists(rn) then
                             missingDB[rn] = true
                         end
                         checkedDB[rn] = true
                     end
-                    -- item reward → PNG
+                    -- PNG check
                     if INV_RES_PATH and not checkedIMG[rn] then
                         local exists = image_exists(rn)
                         if exists == false and not missingDB[rn] then
@@ -330,34 +344,197 @@ local function scan_crafting_refs()
         end
     end
 
-    -- Logs
-    for nm in pairs(missingDB) do
-        print(("^1missed item in DB: ^7%s"):format(nm))
-    end
-    for nm in pairs(missingIMG) do
-        print(("^6item has no PNG: ^7%s"):format(nm))
-    end
-    for _, rec in ipairs(malformedReward) do
-        print(("^1malformed reward (empty name) in recipe: ^7%s"):format(rec))
+    -- Exit early if no problems
+    if not next(malformedReward) and not next(missingDB) and not next(missingIMG) and not next(missingWeapons) then
+        return
     end
 
-    local cDB, cIMG = 0, 0
-    for _ in pairs(missingDB) do cDB = cDB + 1 end
-    for _ in pairs(missingIMG) do cIMG = cIMG + 1 end
-    print(("^7scan complete. Missing in DB: ^1%d^7, missing PNG: ^6%d^7."):format(cDB, cIMG))
+    -- Structured logs
+    if #malformedReward > 0 then
+        print("^1[CONFIG] Invalid recipes detected:^7")
+        for _, msg in ipairs(malformedReward) do
+            print("   ^1recipe^7 = "..msg)
+        end
+    end
+
+    if next(missingDB) then
+        print("^1[DATABASE] Missing items in DB:^7")
+        for nm in pairs(missingDB) do
+            print(("   ^1item name^7 = %s"):format(nm))
+        end
+    end
+
+    if next(missingIMG) then
+        print("^6[INVENTORY] Items without PNG icons:^7")
+        for nm in pairs(missingIMG) do
+            print(("   ^6image name^7 = %s"):format(nm))
+        end
+    end
+
+    if next(missingWeapons) then
+        print("^3[INVENTORY] Missing weapons in config/weapons.lua:^7")
+        for nm in pairs(missingWeapons) do
+            print(("   ^3weapon name^7 = %s"):format(nm))
+        end
+    end
+
+    print("^5[INFO] When all errors are fixed, this debug output will disappear.^7")
 end
 
 -- run once on start (give DB adapter a fair chance to initialize)
 CreateThread(function()
-    -- pre-detect DB mode
-    db_item_exists("__probe__") -- fills DB_MODE string
-    scan_crafting_refs()
+    if Config.CraftingDiagnostics then
+        db_item_exists("__probe__")
+        scan_crafting_refs()
+    end
 end)
 
--- optional: admin command to rescan without restart (server console only or ACE)
-RegisterCommand("craftscan", function(src)
-    if src ~= 0 and not IsPlayerAceAllowed(src, "command.craftscan") then
-        return
+-- =====================================================================
+-- Item Labels LUT for Crafting, Single-init, deduplicated logging.
+-- =====================================================================
+local Core = nil
+local _lut_inited = false   -- guard to prevent double init
+local _lut_refreshing = false
+
+-- ---------- DB helpers ----------
+local function qmarks(n) local t = {} for i=1,n do t[i]="?" end return table.concat(t, ",") end
+
+-- DB adapter wrapper
+local function db_fetch_all(sql, params)
+  if exports.oxmysql and exports.oxmysql.executeSync then
+    return exports.oxmysql:executeSync(sql, params or {}) or {}
+  end
+  if MySQL and MySQL.Sync and MySQL.Sync.fetchAll then
+    return MySQL.Sync.fetchAll(sql, params or {}) or {}
+  end
+  print("^7 No DB adapter (oxmysql/mysql-async). Item labels will be empty.")
+  return {}
+end
+
+-- ---------- Collect all item keys from recipes (ingredients + item-type rewards) ----------
+local function collect_item_keys()
+    local set = {}
+    local function add(n)
+        if type(n) == "string" and n ~= "" then set[n:lower()] = true end
     end
-    scan_crafting_refs()
-end, true)
+
+    for _, r in ipairs(Config.Crafting or {}) do
+        for _, it in ipairs(r.Items or {}) do add(it.name) end
+        for _, rw in ipairs(r.Reward or {}) do
+            if not (r.Type == "weapon" and is_weapon_name(rw.name)) then
+                add(rw.name)
+            end
+        end
+    end
+
+    local arr = {}
+    for k in pairs(set) do arr[#arr + 1] = k end
+    table.sort(arr)
+    return arr
+end
+
+-- ---------- Build/Refresh LUT ----------
+local function refresh_items_into_lut(out)
+    local keys = collect_item_keys()
+    if #keys == 0 then
+        return 0, 0
+    end
+
+    local sql = ("SELECT item, label, `desc`, `limit` FROM items WHERE LOWER(item) IN (%s)")
+        :format(qmarks(#keys))
+    local rows = db_fetch_all(sql, keys)
+    local matched, seen = 0, {}
+
+    for _, r in ipairs(rows) do
+        local k = lower_or_nil(r.item)
+        if k and not seen[k] then
+            out[k] = {
+                label = r.label or r.item,
+                desc  = r["desc"] or "",
+                limit = tonumber(r["limit"]) or nil
+            }
+            seen[k] = true
+            matched = matched + 1
+        end
+    end
+
+    return matched, #keys
+end
+
+local function refresh_weapons_into_lut(out)
+    local file = LoadResourceFile(INV_RES_NAME, "config/weapons.lua")
+    if not file then
+        print(("^7 weapons.lua not found in resource '%s' (skipping weapon labels)."):format(INV_RES_NAME))
+        return 0, 0
+    end
+
+    -- run the file in a sandbox to capture SharedData.Weapons
+    local env = { }
+    local chunk, err = load(file, "@weapons.lua", "t", env)
+    if not chunk then
+        print("^7 Failed to load weapons.lua: "..tostring(err))
+        return 0, 0
+    end
+
+    local ok, runtimeErr = pcall(chunk)
+    if not ok then
+        print("^7 Failed to execute weapons.lua: "..tostring(runtimeErr))
+        return 0, 0
+    end
+
+    local W = env.SharedData and env.SharedData.Weapons or {}
+    local matched, total = 0, 0
+    for hash, def in pairs(W) do
+        total = total + 1
+        local k = lower_or_nil(hash)
+        if k and type(def)=="table" then
+        out[k] = out[k] or {} -- don't overwrite DB items
+        out[k].label = def.Name or out[k].label or hash
+        out[k].desc  = def.Desc or out[k].desc or ""
+        out[k].limit = out[k].limit -- keep whatever was there (usually nil for weapons)
+        matched = matched + 1
+        end
+    end
+
+    return matched, total
+end
+
+-- ---------- One-time init (wait for Core, register callback, prime LUT) ----------
+local function init_labels_lut_once()
+    if _lut_inited then return end
+    _lut_inited = true
+
+    -- Single Core init (no duplicates) + unified callback
+    CreateThread(function()
+        -- wait until Core is valid
+        while not Core do
+            Wait(100)
+            Core = exports.vorp_core:GetCore()
+        end
+
+        -- register callback once
+        Core.Callback.Register("vorp_crafting:GetLabelLUT", function(source, cb)
+            cb(LabelLUT) -- includes items + weapons
+        end)
+
+        -- initial build (items + weapons)
+        LabelLUT = {}
+        refresh_items_into_lut(LabelLUT)
+        refresh_weapons_into_lut(LabelLUT)
+    end)
+end
+
+
+-- Call init once at load, and also from onResourceStart (guard prevents duplicates)
+init_labels_lut_once()
+
+AddEventHandler("onResourceStart", function(resName)
+  if resName == GetCurrentResourceName() then
+    CreateThread(function()
+      while not Core do Wait(100) end
+      LabelLUT = {}
+      refresh_items_into_lut(LabelLUT)
+      refresh_weapons_into_lut(LabelLUT)
+    end)
+  end
+end)
