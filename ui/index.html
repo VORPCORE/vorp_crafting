@@ -1,60 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8" />
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <div id="app">
       <div :class="fontClass">
         <div v-show="visible && language" class="panel-wrap">
-          <h1>{{language.CraftHeader}}</h1>
+          <h1>{{ language.CraftHeader }}</h1>
+
           <div class="panel-content">
+            <!-- categories -->
             <div class="categories" v-show="currentRoute == 'home'">
-              <div class="bcc-button" v-for="(cat, index) in categories" :key="cat.ident+index" @click="currentRoute = cat.ident">
-                <span class="statictext">{{cat.text}}</span>
+              <div
+                class="bcc-button"
+                v-for="cat in categories"
+                :key="cat.ident"
+                @click="currentRoute = cat.ident"
+              >
+                <span class="statictext">{{ cat.text }}</span>
               </div>
               <div class="bcc-button" @click="closeView()">
-                <span class="statictext">{{language.ExitButton}}</span>
+                <span class="statictext">{{ language.ExitButton }}</span>
               </div>
             </div>
-  
-            <div class="craftable-wrap" v-for="(cata, index) in Object.keys(consumables)" :key="'catitems'+index"   v-show="currentRoute == cata" >
-              <div class="bcc-button" v-for="(it, index) in consumables[cata]" @click="handleItemClick(it)" @mouseover="toggleDesc(it, true)" @mouseleave="toggleDesc(null, false)">
-                <div class="button-content">
-                  <img :src="getItemImg(it.Reward[0].name)" class="item-icon">
-                  <div class="text">{{it.Text}}</div>
-                  <div class="subtext" v-if="it.SubText">{{it.SubText}}</div>
-                </div>
-                <div v-if="style.descriptionsidebar == false" class="description">
-                  <div>{{it.Desc}}</div>
+
+            <!-- Craftable recipes list -->
+            <div
+              class="craftable-wrap"
+              v-for="cata in Object.keys(consumables)"
+              :key="'cat_'+cata"
+              v-show="currentRoute == cata"
+            >
+              <div
+                class="bcc-button"
+                v-for="it in consumables[cata]"
+                :key="(it.Reward && it.Reward[0] && it.Reward[0].name) || it.Text || JSON.stringify(it)"
+                @click="handleItemClick(it)"
+                @mouseover="toggleDesc(it, true)"
+                @mouseleave="toggleDesc(null, false)"
+              >
+              <div class="button-content">
+                <img :src="getItemImg(rewardName(it))" class="item-icon" @error="e => e.target.style.display='none'" alt="Item icon">
+                <div class="text-wrap">
+                  <div class="text">{{ displayName(it) }}</div>
+                  <div class="subtext" v-if="limitOf(rewardName(it))">MAX = {{ limitOf(rewardName(it)) }}</div>
                 </div>
               </div>
-              <div class="bcc-button" @click="currentRoute = 'home'"><span class="statictext">{{language.BackButton}}</span></div>
+                <div v-if="style.descriptionsidebar == false" class="description">
+                  <div>{{ it.Desc }}</div>
+                </div>
+              </div>
+
+              <div class="bcc-button" @click="currentRoute = 'home'">
+                <span class="statictext">{{ language.BackButton }}</span>
+              </div>
             </div>
           </div>
 
+          <!-- Ingredients sidebar -->
           <div class="ing-tile" v-if="desc.show && style.descriptionsidebar == true">
-            <h2>{{ language?.IngredientsHeader || 'Ingredients' }}</h2>
-            <div class="ing-row" v-for="(e, index) in IngredientEntries" :key="'ing'+index">
-              <img class="ing-icon" :src="e.img" @error="($event) => { $event.target.style.display = 'none' }">
-              <span class="ing-text">x{{ e.count }} {{ e.name }}</span>
+            <h2>{{ (language && language.IngredientsHeader) || 'Ingredients' }}</h2>
+            <div class="ing-row" v-for="(e, i) in IngredientEntries" :key="'ing'+i">
+              <img class="ing-icon" :src="e.img" @error="e => e.target.style.display='none'" :alt="e.label">
+              <span class="ing-text">x{{ e.count }} {{ e.label }}</span>
             </div>
           </div>
         </div>
+
+        <!-- Quantity input -->
         <div v-if="showInput" class="input-wrap">
           <div class="inputs">
-            <div class="message">{{InputCraftText}}</div>
+            <div class="message">{{ InputCraftText }}</div>
             <div class="value-button" id="decrease" @click="decrease">-</div>
             <input type="number" id="number" v-model="quantity" @keyup="formatQuantity" />
             <div class="value-button" id="increase" @click="increase">+</div>
-            <div class="add-button" @click="craftItem">{{language.InputCraft}}{{ quantity > 1 ? 's' : '' }}</div>
-            <div class="cancel-button" @click="showInput = false">{{language.InputCancel}}</div>
+            <div class="add-button" @click="craftItem">
+              {{ language.InputCraft }}{{ quantity > 1 ? 's' : '' }}
+            </div>
+            <div class="cancel-button" @click="showInput = false">{{ language.InputCancel }}</div>
           </div>
         </div>
       </div>
     </div>
+
+    <script src="vendor/vue.js" defer></script>
+    <script src="app.js" defer></script>
   </body>
 </html>
-
-<script src="vendor/vue.js"></script>
-<script src="app.js"></script>
