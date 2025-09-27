@@ -23,7 +23,7 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
     local _source = source
     local Character = Core.getUser(_source).getUsedCharacter
 
-    local Webhook = '' -- Set your webhook URL here
+    local Webhook = Config.CraftingWebhook or "" -- Set your webhook URL here
     local function getServerCraftable()
         local crafting = nil
         for _, v in ipairs(Config.Crafting) do
@@ -518,3 +518,4 @@ AddEventHandler("onResourceStart", function(resName)
   end
 
 end)
+
