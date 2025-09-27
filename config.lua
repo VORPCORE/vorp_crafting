@@ -6,7 +6,8 @@ Config.DevMode = false -- enable this if you want to make testes, dont leave tru
 
 Config.CraftingDiagnostics = false -- if true: on startup checks all crafting recipes for missing DB items, weapons, PNG icons, and malformed entries
 
---Webhook move to server.lua line 26 
+-- Webhook settings
+Config.CraftingWebhook = ""  -- put your Discord webhook here (leave empty to disable logging)
 
 Config.CampFireItem = "campfire"
 
@@ -1087,4 +1088,5 @@ Config.Animations = {
         type = 'standard'
     }
 }
+
 
