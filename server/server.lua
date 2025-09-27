@@ -372,7 +372,6 @@ end
 -- Item Labels LUT for Crafting, Single-init, deduplicated logging.
 -- =====================================================================
 local _lut_inited = false   -- guard to prevent double init
-local _lut_refreshing = false
 
 -- ---------- DB helpers ----------
 local function qmarks(n) local t = {} for i=1,n do t[i]="?" end return table.concat(t, ",") end
@@ -478,30 +477,22 @@ end
 local function init_labels_lut_once()
     if _lut_inited then return end
     _lut_inited = true
-
-    -- initial build (items + weapons)
     LabelLUT = {}
     refresh_items_into_lut(LabelLUT)
     refresh_weapons_into_lut(LabelLUT)
 end
 
--- 1) Labels will always be shown when opening the crafting menu
-init_labels_lut_once()
-
--- 2) Diagnostics of missing items in the database, weapons in weapons.lua and images only if Config.CraftingDiagnostics is enabled
-if Config.CraftingDiagnostics then
+-- Single initialization/re-initialization path at resource start/restart
+AddEventHandler("onResourceStart", function(resName)
+    if resName ~= GetCurrentResourceName() then return end
     init_labels_lut_once()
-    AddEventHandler("onResourceStart", function(resName)
-        if resName == GetCurrentResourceName() then
-            CreateThread(function()
-                LabelLUT = {}
-                refresh_items_into_lut(LabelLUT)
-                refresh_weapons_into_lut(LabelLUT)
-            end)
-        end
-    end)
+    if Config.CraftingDiagnostics then
+        SetTimeout(1000, scan_crafting_refs)
+    end
+end)
 
-    SetTimeout(1000, function()
-        scan_crafting_refs()
-    end)
-end
+-- Callback for the client/services/vui.lua
+Core.Callback.Register("vorp_crafting:GetLabelLUT", function(source, cb)
+    if not _lut_inited then init_labels_lut_once() end
+    cb(LabelLUT or {})
+end)
