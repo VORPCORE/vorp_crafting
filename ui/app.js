@@ -16,6 +16,7 @@ createApp({
       },
       job: null,
       language: {},
+      labels: {},
       location: {},
       categories: [],
       consumables: {},
@@ -105,32 +106,61 @@ createApp({
   computed: {
     fontClass() {
       let fontc = {}
-
-      switch(this.style.fontSize) {
-        case 's':
-          fontc['smallfont'] = true
-          break;
-        case 'm':
-          fontc['mediumfont'] = true
-          break;
-        case 'l':
-          fontc['largefont'] = true
-          break;
-        default:
-          break; 
+      switch (this.style.fontSize) {
+        case 's': fontc['smallfont']  = true; break;
+        case 'm': fontc['mediumfont'] = true; break;
+        case 'l': fontc['largefont']  = true; break;
+        default: break;
       }
-
       return fontc
     },
     InputCraftText() {
-      return  this.activeCraftable.Text && this.language.InputHeader ? this.language.InputHeader.replace('{{msg}}', this.activeCraftable.Text) : ''
+      const base  = this.language.InputHeader || '';
+      const title = this.activeCraftable ? this.displayName(this.activeCraftable) : '';
+      return base.replace('{{msg}}', title);
     },
-    Ingredients() {
-      if (this.desc.show == false) return ''
-      return this.desc.data.Desc.replace('Recipe: ', '').replace('Recipe ', '').split(',')
-    }
+    IngredientEntries() {
+      if (!this.desc.show || !this.desc.data) return [];
+      const it = this.desc.data;
+
+      if (Array.isArray(it.Items) && it.Items.length > 0) {
+        return it.Items.map(x => {
+          const key   = (x.name || '').trim();
+          const count = Number(x.count || 1);
+          return {
+            key,
+            label: this.labelOf(key),
+            count,
+            img: this.getItemImg(key)
+          };
+        });
+      }
+      return [];
+    },
   },
   methods: {
+    getItemImg(name) {
+      return `nui://vorp_inventory/html/img/items/${name}.png`;
+    },
+    labelOf(name) {
+      if (!name) return '';
+      const k = String(name).toLowerCase();
+      return this.labels?.[k]?.label || name;
+    },
+    limitOf(name) {
+      if (!name) return null;
+      const k = String(name).toLowerCase();
+      const lim = this.labels?.[k]?.limit;
+      return (typeof lim === 'number') ? lim : null;
+    },
+    rewardName(recipe) {
+      if (!recipe || !Array.isArray(recipe.Reward) || recipe.Reward.length === 0) return '';
+      return recipe.Reward[0].name || '';
+    },
+    displayName(recipe) {
+      const rn = this.rewardName(recipe);
+      return this.labelOf(rn) || rn;
+    },
     onMessage(event) {
       switch(event.data.type) {
         case "vorp-craft-open":
@@ -216,79 +246,80 @@ createApp({
         this.quantity = value
     },
     closeView() {
+      this.showInput = false;
+      this.activeCraftable = null;
+      this.desc.show = false;
+      this.currentRoute = 'home';
       this.visible = false;
+
       fetch(`https://${GetParentResourceName()}/vorp-craft-close`, {
         method: 'POST'
       })
     },
     setData(data) {
-      let craftables = data.craftables
-      let categories = data.categories
-      let crafttime = data.crafttime
-      let style = data.style
-      let language = data.language
-      let location = data.location
-      let charJob = data.job
+      const craftables = data.craftables || [];
+      const categories = data.categories || [];
+      const crafttime  = data.crafttime;
+      const style      = data.style || {};
+      const language   = data.language || {};
+      const location   = data.location || {};
+      const charJob    = data.job;
+      const labels     = data.labels || data.LabelsLUT || {};
+      const consumables = {};
+      const filteredcat = [];
 
-      let consumables = {}
-      let filteredcat = []
-      // Setup object with keys
+      // Setup categories buckets
       categories.forEach(cat => {
-        consumables[cat.ident] = []
-        let jobcheck = cat.Job === 0 ? true : cat.Job.some(j => j === charJob);
+        consumables[cat.ident] = [];
+        const jobcheck = cat.Job === 0 ? true : cat.Job.some(j => j === charJob);
 
         if (jobcheck) {
           if (cat.Location == 0) {
-            filteredcat.push(cat)
+            filteredcat.push(cat);
           } else {
-            let l = cat.Location.length
-            let pos = 0
-            for (pos; pos < l; pos++) {
-              let loc = cat.Location[pos]
+            const l = cat.Location.length;
+            for (let pos = 0; pos < l; pos++) {
+              const loc = cat.Location[pos];
               if (loc == location?.id) {
-                filteredcat.push(cat)
-                break
+                filteredcat.push(cat);
+                break;
               }
             }
           }
         }
       });
 
-
-
-      // Fill object created above
+      // Fill buckets with craftables
       craftables.forEach(item => {
-        let jobcheck = item.Job === 0 ? true : item.Job.some(j => j === charJob);
+        const jobcheck = item.Job === 0 ? true : item.Job.some(j => j === charJob);
 
         if (jobcheck) {
-          // Filter out locations
           if (item.Location == 0) {
             if (consumables[item.Category]) {
-              consumables[item.Category].push(item)
+              consumables[item.Category].push(item);
             }
           } else {
-            let l = item.Location.length
-            let pos = 0
-            for (pos; pos < l; pos++) {
-              let loc = item.Location[pos]
+            const l = item.Location.length;
+            for (let pos = 0; pos < l; pos++) {
+              const loc = item.Location[pos];
               if (loc == location?.id) {
                 if (consumables[item.Category]) {
-                  consumables[item.Category].push(item)
+                  consumables[item.Category].push(item);
                 }
-                break
+                break;
               }
             }
           }
         }
       });
 
-
-      this.language = language
-      this.consumables = consumables
-      this.categories = filteredcat
-      this.crafttime = crafttime
-      this.style = style
-      this.location = location
-    }
+      this.language    = language;
+      this.labels      = labels;
+      this.consumables = consumables;
+      this.categories  = filteredcat;
+      this.crafttime   = crafttime;
+      this.style       = style;
+      this.location    = location;
+    },
   },
 }).mount("#app");

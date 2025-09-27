@@ -4,6 +4,8 @@ Config.defaultlang = "en_lang"
 
 Config.DevMode = false -- enable this if you want to make testes, dont leave true in live servers
 
+Config.CraftingDiagnostics = false -- if true: on startup checks all crafting recipes for missing DB items, weapons, PNG icons, and malformed entries
+
 --Webhook move to server.lua line 26 
 
 Config.CampFireItem = "campfire"
@@ -1085,3 +1087,6 @@ Config.Animations = {
         type = 'standard'
     }
 }
+
+
+
