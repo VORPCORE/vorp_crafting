@@ -23,7 +23,7 @@ RegisterNetEvent('vorp:startcrafting', function(craftable, countz)
     local _source = source
     local Character = Core.getUser(_source).getUsedCharacter
 
-    local Webhook = Config.CraftingWebhook or "" -- Set your webhook URL here
+    local Webhook = '' -- Set your webhook URL here
     local function getServerCraftable()
         local crafting = nil
         for _, v in ipairs(Config.Crafting) do
@@ -260,8 +260,6 @@ local function dump_table_lua(tbl)
 end
 
 local function scan_crafting_refs()
-    Wait(1500) -- wait a bit for other resources to start up
-
     local missingDB, missingIMG, malformedReward, missingWeapons = {}, {}, {}, {}
     local checkedDB, checkedIMG = {}, {}
 
@@ -364,16 +362,15 @@ local function scan_crafting_refs()
 end
 
 -- run once on start (give DB adapter a fair chance to initialize)
-SetTimeout(1000, function()
-    if Config.CraftingDiagnostics then
+if Config.CraftingDiagnostics then
+    SetTimeout(1000, function()
         scan_crafting_refs()
-    end
-end)
+    end)
+end
 
 -- =====================================================================
 -- Item Labels LUT for Crafting, Single-init, deduplicated logging.
 -- =====================================================================
-local Core = nil
 local _lut_inited = false   -- guard to prevent double init
 local _lut_refreshing = false
 
@@ -385,7 +382,6 @@ local function db_fetch_all(sql, params)
   if exports.oxmysql and exports.oxmysql.executeSync then
     return exports.oxmysql:executeSync(sql, params or {}) or {}
   end
-
   print("^7 No oxmysql adapter. Item labels will be empty.")
   return {}
 end
@@ -478,44 +474,31 @@ local function refresh_weapons_into_lut(out)
     return matched, total
 end
 
--- ---------- One-time init (wait for Core, register callback, prime LUT) ----------
+-- ---------- One-time init (register callback, prime LUT) ----------
 local function init_labels_lut_once()
     if _lut_inited then return end
     _lut_inited = true
 
-    -- Single Core init (no duplicates) + unified callback
-    CreateThread(function()
-        -- wait until Core is valid
-        while not Core do
-            Wait(100)
-            Core = exports.vorp_core:GetCore()
-        end
-
-        -- register callback once
-        Core.Callback.Register("vorp_crafting:GetLabelLUT", function(source, cb)
-            cb(LabelLUT) -- includes items + weapons
-        end)
-
-        -- initial build (items + weapons)
-        LabelLUT = {}
-        refresh_items_into_lut(LabelLUT)
-        refresh_weapons_into_lut(LabelLUT)
+    -- register callback once
+    Core.Callback.Register("vorp_crafting:GetLabelLUT", function(source, cb)
+        cb(LabelLUT) -- includes items + weapons
     end)
-end
 
+    -- initial build (items + weapons)
+    LabelLUT = {}
+    refresh_items_into_lut(LabelLUT)
+    refresh_weapons_into_lut(LabelLUT)
+end
 
 -- Call init once at load, and also from onResourceStart (guard prevents duplicates)
 init_labels_lut_once()
 
 AddEventHandler("onResourceStart", function(resName)
-  if resName == GetCurrentResourceName() then
-    CreateThread(function()
-      while not Core do Wait(100) end
-      LabelLUT = {}
-      refresh_items_into_lut(LabelLUT)
-      refresh_weapons_into_lut(LabelLUT)
-    end)
-  end
-
+    if resName == GetCurrentResourceName() then
+        CreateThread(function()
+            LabelLUT = {}
+            refresh_items_into_lut(LabelLUT)
+            refresh_weapons_into_lut(LabelLUT)
+        end)
+    end
 end)
-
