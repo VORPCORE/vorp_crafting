@@ -134,6 +134,7 @@ createApp({
     onMessage(event) {
       switch(event.data.type) {
         case "vorp-craft-open":
+          this.resetInputState()
           this.setData(event.data)
           this.visible = true;
           break;
@@ -183,6 +184,11 @@ createApp({
         console.warn(error);
       })
     },
+    resetInputState() {
+      this.showInput = false
+      this.activeCraftable = null
+      this.quantity = 1
+    },
     handleItemClick(data) {
       this.activeCraftable = data
       this.showInput = true
@@ -217,6 +223,8 @@ createApp({
     },
     closeView() {
       this.visible = false;
+      this.currentRoute = 'home'
+      this.resetInputState()
       fetch(`https://${GetParentResourceName()}/vorp-craft-close`, {
         method: 'POST'
       })
