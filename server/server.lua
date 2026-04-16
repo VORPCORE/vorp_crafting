@@ -1,6 +1,53 @@
 local Core = exports.vorp_core:GetCore()
 
 CreateThread(function()
+    if Core.RegisterJobs then
+        local jobsData <const> = {}
+
+        local function addJobs(jobList)
+            if type(jobList) == "string" then
+                if jobList ~= "" then
+                    jobsData[jobList] = {}
+                end
+                return
+            end
+
+            if type(jobList) ~= "table" then
+                return
+            end
+
+            for _, value in pairs(jobList) do
+                local jobName <const> = value
+                if type(jobName) == "string" and jobName ~= "" then
+                    jobsData[jobName] = {}
+                end
+            end
+        end
+
+        addJobs(Config.CampfireJobLock)
+
+        for _, location in ipairs(Config.Locations) do
+            addJobs(location.Job)
+        end
+
+        for _, category in ipairs(Config.Categories) do
+            addJobs(category.Job)
+        end
+
+        for _, crafting in ipairs(Config.Crafting) do
+            addJobs(crafting.Job)
+        end
+
+        if next(jobsData) then
+            Core.RegisterJobs(jobsData, GetCurrentResourceName())
+        end
+    else
+        -- wait for some time to print this
+        -- print("^1vorp_crafting: server: RegisterJobs not found update vorp core to the latest version^7")
+    end
+end)
+
+CreateThread(function()
     local item = Config.CampFireItem
     exports.vorp_inventory:registerUsableItem(item, function(data)
         exports.vorp_inventory:subItemById(data.source, data.item.id)
